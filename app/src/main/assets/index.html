@@ -55,12 +55,25 @@ button,.btn{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none
 .sale-empty{padding:22px;text-align:center;color:var(--muted)}
 .sale-history-row{padding:10px 0;border-bottom:1px solid var(--line)}
 
+
+/* Android mobile navigation fix */
+body{padding-bottom:130px!important}
+.tabs{bottom:0!important;min-height:72px!important;padding-bottom:8px!important}
+.mobile-nav-open{position:fixed;right:14px;bottom:92px;z-index:500;width:58px;height:58px;border:0;border-radius:50%;background:#111827;color:#fff;font-size:26px;font-weight:900;box-shadow:0 8px 24px #0004}
+.mobile-nav-sheet{position:fixed;left:12px;right:12px;bottom:158px;z-index:499;background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:12px;box-shadow:0 18px 50px #0005;max-height:68vh;overflow:auto}
+.mobile-nav-title{font-size:18px;font-weight:900;margin:2px 4px 10px}
+.mobile-nav-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.mobile-nav-grid .tab{display:block!important;border:1px solid #e5e7eb;border-radius:12px!important;background:#fff!important;color:#111827!important;box-shadow:none!important;padding:12px 10px!important;font-size:13px!important;text-align:center}
+.mobile-nav-grid .tab.hidden{display:none!important}
+.mobile-nav-grid .tab.active{background:#111827!important;color:#fff!important}
+@media(min-width:761px){.mobile-nav-open,.mobile-nav-sheet{display:none!important}}
+
 </style>
 </head>
 <body>
 <div id="authScreen" class="auth">
   <div class="auth-card">
-    <div class="auth-top"><div><h1 data-i18n="brand">كراج حسن</h1><div class="muted" data-i18n="authSubtitle">نظام دخول الموظفين وحجز السيارات</div><div class="muted" style="margin-top:4px;font-weight:800">V4.0 Test</div></div><div class="language-switch"><button id="authArBtn" class="auth-lang" type="button" onclick="setLanguage('ar')">عربي</button><button id="authEnBtn" class="auth-lang" type="button" onclick="setLanguage('en')">English</button></div></div>
+    <div class="auth-top"><div><h1 data-i18n="brand">كراج حسن</h1><div class="muted" data-i18n="authSubtitle">نظام دخول الموظفين وحجز السيارات</div><div class="muted" style="margin-top:4px;font-weight:800">V4.1 Android</div></div><div class="language-switch"><button id="authArBtn" class="auth-lang" type="button" onclick="setLanguage('ar')">عربي</button><button id="authEnBtn" class="auth-lang" type="button" onclick="setLanguage('en')">English</button></div></div>
     <div class="auth-tabs"><button id="staffModeBtn" class="btn primary" data-i18n="staffLoginMode">دخول الموظفين</button><button id="customerModeBtn" class="btn secondary" data-i18n="customerCodeMode">كود الزبون</button></div>
     <div id="staffLogin">
       <label data-i18n="username">اسم المستخدم</label><input id="loginUser" autocomplete="username" />
@@ -87,7 +100,28 @@ button,.btn{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none
 </div>
 
 <div id="appShell" class="hidden">
-<header><div><h1 data-i18n="brand">كراج حسن</h1><div class="sub" data-i18n="subtitle">إدارة السيارات والفواتير والمخزون</div><div class="sub" style="margin-top:2px;font-weight:800">V4.0 Test</div></div><div class="head-actions"><span id="userChip" class="user-chip"></span><button id="logoutBtn" class="lang" type="button" onclick="hardLogout(event)" data-i18n="logout">خروج</button><div class="language-switch"><button id="langArBtn" class="lang" type="button" onclick="setLanguage('ar')">عربي</button><button id="langEnBtn" class="lang" type="button" onclick="setLanguage('en')">English</button></div></div></header>
+<header><div><h1 data-i18n="brand">كراج حسن</h1><div class="sub" data-i18n="subtitle">إدارة السيارات والفواتير والمخزون</div><div class="sub" style="margin-top:2px;font-weight:800">V4.1 Android</div></div><div class="head-actions"><span id="userChip" class="user-chip"></span><button id="logoutBtn" class="lang" type="button" onclick="hardLogout(event)" data-i18n="logout">خروج</button><div class="language-switch"><button id="langArBtn" class="lang" type="button" onclick="setLanguage('ar')">عربي</button><button id="langEnBtn" class="lang" type="button" onclick="setLanguage('en')">English</button></div></div></header>
+
+<button id="mobileNavOpen" class="mobile-nav-open no-print" type="button" aria-label="Menu" onclick="toggleMobileNav()">☰</button>
+<div id="mobileNavSheet" class="mobile-nav-sheet hidden no-print">
+  <div class="mobile-nav-title">Menu / القائمة</div>
+  <div class="mobile-nav-grid">
+    <button class="tab active" data-tab="dashboard">🏠 <span data-i18n="dashboard">الرئيسية</span></button>
+    <button class="tab" data-tab="inside">🔴 <span data-i18n="insideGarage">دخول السيارة</span></button>
+    <button class="tab" data-tab="exited">✅ <span data-i18n="exitTab">خروج</span></button>
+    <button class="tab" data-tab="bookings">📅 <span data-i18n="bookings">الحجوزات</span></button>
+    <button class="tab" data-tab="intake">➕ <span data-i18n="intake">دخول سيارة</span></button>
+    <button class="tab mechanic-only hidden" data-tab="worker">🔧 <span data-i18n="myWork">شغلي</span></button>
+    <button class="tab" data-tab="jobs">🚗 <span data-i18n="jobs">السيارات والفواتير</span></button>
+    <button class="tab" data-tab="archive">🗂️ <span data-i18n="archive">الأرشيف</span></button>
+    <button class="tab" data-tab="inventory">➕ <span data-i18n="addInventory">إضافة مخزون</span></button>
+    <button class="tab" data-tab="sales">📦 <span data-i18n="stockSales">المخزون / البيع</span></button>
+    <button class="tab admin-only" data-tab="reports">📊 <span data-i18n="reports">التوتال</span></button>
+    <button class="tab admin-only" data-tab="admin">👥 <span data-i18n="admin">الإدارة</span></button>
+    <button class="tab" data-tab="backup">💾 <span data-i18n="backup">نسخة</span></button>
+  </div>
+</div>
+
 <div class="wrap">
   <div class="tabs no-print">
     <button class="tab active" data-tab="dashboard">🏠 <span data-i18n="dashboard">الرئيسية</span></button>
@@ -311,7 +345,9 @@ window.setLanguage=setLanguage;
 function toggleLang(){setLanguage(lang==='ar'?'en':'ar');}
 function isAdmin(){return currentUser?.role==='admin'}
 function canOpenTab(id){if(isAdmin())return true;if(currentUser?.role==='mechanic')return id==='worker';if(currentUser?.role==='seller')return id==='sales'||id==='salesDone';return id==='intake'}
-function switchTab(id){if(currentUser&&!canOpenTab(id))id='intake';document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));$(id)?.classList.add('active');document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));window.scrollTo({top:0,behavior:'smooth'})}
+function toggleMobileNav(force){const s=$('mobileNavSheet');if(!s)return;const show=force===true||(force!==false&&s.classList.contains('hidden'));s.classList.toggle('hidden',!show)}
+window.toggleMobileNav=toggleMobileNav;
+function switchTab(id){$('mobileNavSheet')?.classList.add('hidden');if(currentUser&&!canOpenTab(id))id='intake';document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));$(id)?.classList.add('active');document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));window.scrollTo({top:0,behavior:'smooth'})}
 function setMode(customer){$('staffLogin').classList.toggle('hidden',customer);$('customerLogin').classList.toggle('hidden',!customer);$('staffModeBtn').className='btn '+(!customer?'primary':'secondary');$('customerModeBtn').className='btn '+(customer?'primary':'secondary')}
 $('staffModeBtn').onclick=()=>setMode(false);$('customerModeBtn').onclick=()=>setMode(true);
 $('cDate').value=today();$('bDate').value=today();$('dateIn').value=today();$('timeIn').value=timeNow();if($('reportFrom')){$('reportFrom').value=today().slice(0,8)+'01';$('reportTo').value=today();}
