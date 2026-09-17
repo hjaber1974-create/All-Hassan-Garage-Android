@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#111827" />
+<title>Hassan Garage Full Test V4.0</title>
+<link rel="manifest" href="manifest.json" />
+<style>
+:root{--bg:#f3f4f6;--card:#fff;--ink:#111827;--muted:#6b7280;--accent:#111827;--ok:#166534;--danger:#b91c1c;--warn:#92400e;--line:#e5e7eb}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{position:sticky;top:0;z-index:5;background:#111827;color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;justify-content:space-between;box-shadow:0 2px 10px #0002}header h1{font-size:20px;margin:0}.sub{font-size:12px;opacity:.8}.head-actions{display:flex;gap:8px;align-items:center}.user-chip{font-size:12px;background:#ffffff18;border:1px solid #ffffff35;padding:7px 9px;border-radius:999px}.lang{border:1px solid #ffffff55;background:#fff;color:#111827;padding:8px 10px;border-radius:10px;font-weight:700}
+.wrap{max-width:1150px;margin:auto;padding:14px}.tabs{display:flex;gap:8px;overflow:auto;padding-bottom:10px}.tab{white-space:nowrap;border:0;background:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 1px 4px #0001;font-weight:700}.tab.active{background:#111827;color:#fff}.panel{display:none}.panel.active{display:block}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}.card{grid-column:span 12;background:var(--card);border-radius:16px;padding:15px;box-shadow:0 1px 6px #00000012}.half{grid-column:span 6}.third{grid-column:span 4}.quarter{grid-column:span 3}
+h2,h3{margin:0 0 12px}.row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}label{font-size:13px;color:var(--muted);display:block;margin-bottom:4px}input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit}textarea{min-height:78px;resize:vertical}.btn{border:0;border-radius:10px;padding:10px 13px;font-weight:800;cursor:pointer}.primary{background:#111827;color:#fff}.secondary{background:#e5e7eb}.success{background:#dcfce7;color:#166534}.warning{background:#fef3c7;color:#92400e}.danger{background:#fee2e2;color:#991b1b}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.stat{font-size:28px;font-weight:900}.muted{color:var(--muted);font-size:13px}.tablewrap{overflow:auto}.tbl{width:100%;border-collapse:collapse;min-width:760px}.tbl th,.tbl td{padding:10px;border-bottom:1px solid var(--line);text-align:start;font-size:14px}.click-row{cursor:pointer}.click-row:hover{background:#f9fafb}.click-name{font-weight:900;text-decoration:underline;text-underline-offset:3px}.click-hint{font-size:11px;color:var(--muted);margin-top:3px}.day-separator td{background:#111827;color:#fff!important;font-weight:900;padding:14px 16px!important;border-bottom:0!important}.day-separator .day-meta{font-size:12px;font-weight:700;opacity:.82;margin-inline-start:10px}.day-separator.day-toggle{cursor:pointer;user-select:none}.day-separator.day-toggle:hover td{background:#1f2937}.day-folder{display:flex;align-items:center;justify-content:space-between;gap:12px}.day-folder-title{font-size:17px}.day-folder-icon{font-size:20px;line-height:1}.day-items-note{font-size:12px;opacity:.78;font-weight:700}.day-total{display:block;margin-top:6px;font-size:14px;font-weight:900;color:#fff}.day-total-label{opacity:.82;font-weight:700}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#e5e7eb;font-size:12px}.pill.pending{background:#fef3c7;color:#92400e}.pill.approved{background:#dbeafe;color:#1e40af}.pill.rejected{background:#fee2e2;color:#991b1b}.pill.arrived{background:#dcfce7;color:#166534}.total{font-size:22px;font-weight:900}.notice{padding:10px;border-radius:10px;background:#fffbeb;color:#92400e;margin-bottom:10px}.search{margin-bottom:12px}.small{font-size:12px}.invoice{background:#fff}.invoice-head{display:flex;justify-content:space-between;gap:20px}.invoice table{width:100%;border-collapse:collapse;margin-top:15px}.invoice th,.invoice td{border:1px solid #ddd;padding:8px;text-align:start}.footer-note{margin-top:14px;font-size:12px;color:#555}.codebox{font-size:28px;letter-spacing:2px;font-weight:900;background:#111827;color:#fff;padding:14px;border-radius:14px;text-align:center;margin:10px 0}.audit{font-size:12px;padding:8px 0;border-bottom:1px solid #eee}.hidden{display:none!important}
+.auth{position:fixed;inset:0;z-index:99999;min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(160deg,#111827,#374151);overflow:auto}.auth-card{width:min(460px,100%);background:#fff;border-radius:20px;padding:20px;box-shadow:0 20px 60px #0005}.auth-card h1{margin:0 0 4px}.auth-tabs{display:flex;gap:8px;margin:15px 0}.auth-tabs button{flex:1}.demo{font-size:12px;background:#f9fafb;border:1px solid #eee;padding:10px;border-radius:10px;margin-top:12px}.auth-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.auth-lang{border:1px solid var(--line);background:#fff;color:#111827;padding:7px 10px;border-radius:10px;font-weight:800}.language-switch{display:flex;gap:6px;align-items:center}.language-switch .active-lang{background:#111827;color:#fff;border-color:#111827}
+@media(max-width:760px){.half,.third,.quarter{grid-column:span 12}.row,.row3{grid-template-columns:1fr}.wrap{padding:10px}.invoice-head{display:block}.user-chip{display:none}}
+@media print{header,.tabs,.no-print{display:none!important}.wrap{max-width:none;padding:0}.panel{display:none!important}#invoicePanel{display:block!important}.card{box-shadow:none;border:0}.invoice{font-size:12px}}
+
+/* V3 clean mobile layout */
+body{padding-bottom:84px;background:#f4f6f8}
+header{background:#fff;color:#111827;border-bottom:1px solid var(--line);box-shadow:none;padding:14px 16px}
+header .sub{color:#6b7280;opacity:1}.user-chip{background:#f3f4f6;border:1px solid #e5e7eb;color:#374151}.lang{border:1px solid #e5e7eb;background:#fff;color:#111827}
+.card{border:1px solid #e5e7eb;box-shadow:0 1px 2px #00000008}
+.tabs{position:fixed;z-index:50;bottom:0;left:0;right:0;max-width:none;background:#fff;border-top:1px solid #e5e7eb;padding:0;gap:0;overflow-x:auto;box-shadow:0 -2px 10px #0000000d}
+.tabs .tab{flex:1 0 86px;border-radius:0;box-shadow:none;background:#fff;padding:11px 7px;font-size:12px;color:#6b7280}.tabs .tab.active{background:#f9fafb;color:#111827;border-top:3px solid #111827}
+.wrap{padding:14px 14px 28px}.panel{padding-bottom:10px}
+.garage-dot{display:inline-block;width:12px;height:12px;border-radius:50%;background:#dc2626;vertical-align:middle;margin-inline-end:7px;animation:hgblink 1s infinite}
+@keyframes hgblink{0%,100%{opacity:1}50%{opacity:.18}}
+.inside-car-card{border:1px solid var(--line);border-radius:14px;padding:13px;margin:10px 0;background:#fff}
+.inside-car-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.inside-car-title{font-size:17px;font-weight:900}
+.inside-car-meta{font-size:12px;color:var(--muted);margin-top:4px}
+.inside-car-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+
+.vehicle-card{border:1px solid #e5e7eb;border-radius:16px;padding:13px;background:#fff;margin-bottom:10px}.vehicle-card .vc-top{display:flex;align-items:center;gap:8px}.vehicle-card .vc-main{flex:1}.vehicle-card .vc-title{font-weight:900;font-size:17px}.vehicle-card .vc-sub{font-size:13px;color:#6b7280;margin-top:3px}
+.low-stock{background:#fee2e2!important;color:#991b1b!important}.fault-photo{max-width:100%;max-height:260px;object-fit:cover;border-radius:12px;border:1px solid #e5e7eb;margin-top:8px}.fault-box{border:1px solid #e5e7eb;border-radius:14px;padding:11px;margin-top:9px;background:#fff}.prod-row{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #eee;padding:10px 0}.big-kpi{font-size:25px;font-weight:900}
+@media(max-width:760px){header{position:sticky;top:0}.wrap{padding:10px 10px 30px}.tabs{display:flex}.tablewrap{overflow-x:auto}.tbl{min-width:830px}.head-actions{gap:5px}.lang{padding:7px 8px;font-size:12px}.card{border-radius:16px}.stat{font-size:25px}}
+
+
+.required-error{border:2px solid #dc2626!important;background:#fff7f7!important}
+.hg-toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);z-index:9999;background:#111827;color:#fff;padding:11px 15px;border-radius:12px;font-weight:800;box-shadow:0 8px 25px #0003;max-width:90%;text-align:center}
+
+
+button,.btn{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+
+.stock-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.stock-toolbar input{flex:1;min-width:220px}
+.stock-summary{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.sale-result,.sale-line{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.sale-result-main,.sale-line-main{min-width:0;flex:1}
+.sale-result-name,.sale-line-name{font-weight:900}
+.sale-cart-total{font-size:24px;font-weight:900;margin-top:12px}
+.sale-qty{display:flex;gap:6px;align-items:center}
+.sale-qty button{min-width:38px;padding:8px}
+.sale-empty{padding:22px;text-align:center;color:var(--muted)}
+.sale-history-row{padding:10px 0;border-bottom:1px solid var(--line)}
+
+</style>
+</head>
+<body>
+<div id="authScreen" class="auth">
+  <div class="auth-card">
+    <div class="auth-top"><div><h1 data-i18n="brand">كراج حسن</h1><div class="muted" data-i18n="authSubtitle">نظام دخول الموظفين وحجز السيارات</div><div class="muted" style="margin-top:4px;font-weight:800">V4.0 Test</div></div><div class="language-switch"><button id="authArBtn" class="auth-lang" type="button" onclick="setLanguage('ar')">عربي</button><button id="authEnBtn" class="auth-lang" type="button" onclick="setLanguage('en')">English</button></div></div>
+    <div class="auth-tabs"><button id="staffModeBtn" class="btn primary" data-i18n="staffLoginMode">دخول الموظفين</button><button id="customerModeBtn" class="btn secondary" data-i18n="customerCodeMode">كود الزبون</button></div>
+    <div id="staffLogin">
+      <label data-i18n="username">اسم المستخدم</label><input id="loginUser" autocomplete="username" />
+      <label style="margin-top:10px" data-i18n="passwordPin">كلمة المرور / الرقم السري</label><input id="loginPass" type="password" autocomplete="current-password" />
+      <label style="margin-top:12px;display:flex;align-items:center;gap:8px;color:var(--ink);cursor:pointer">
+        <input id="rememberLogin" type="checkbox" style="width:auto;min-width:18px;height:18px" />
+        <span data-i18n="rememberLogin">حفظ اسم المستخدم وكلمة المرور على هذا الجهاز</span>
+      </label>
+      <div class="muted" style="margin-top:5px" data-i18n="rememberLoginHint">استخدم هذا الخيار فقط على جهازك الشخصي.</div>
+      <div class="actions"><button id="loginBtn" class="btn primary" data-i18n="login">دخول</button></div>
+      <div class="demo"><span data-i18n="firstRun">أول تشغيل</span>: <b>admin</b> / <b>1234</b>. <span data-i18n="changePasswordHint">غيّر كلمة السر من صفحة الإدارة بعد التجربة.</span></div>
+    </div>
+    <div id="customerLogin" class="hidden">
+      <label data-i18n="customerCode">كود الزبون</label><input id="customerCodeInput" maxlength="12" data-i18n-placeholder="customerCodeExample" placeholder="مثال: HG-482913" />
+      <div class="actions"><button id="openCustomerForm" class="btn primary" data-i18n="openRequest">فتح الطلب</button></div>
+      <div id="customerForm" class="hidden" style="margin-top:14px">
+        <div class="row"><div><label data-i18n="name">الاسم</label><input id="cName" /></div><div><label data-i18n="phoneOnly">الهاتف</label><input id="cPhone" /></div><div><label data-i18n="plate">رقم اللوحة</label><input id="cPlate" /></div><div><label data-i18n="car">السيارة</label><input id="cCar" data-i18n-placeholder="carExample" placeholder="مثال: تويوتا كورولا 2018" /></div></div>
+        <label style="margin-top:10px" data-i18n="problem">المشكلة</label><textarea id="cComplaint"></textarea>
+        <div class="row"><div><label data-i18n="requestedDate">التاريخ المطلوب</label><input id="cDate" type="date" /></div><div><label data-i18n="requestedTime">الوقت المطلوب</label><input id="cTime" type="time" /></div></div>
+        <div class="actions"><button id="submitCustomerBooking" class="btn success" data-i18n="submitRequest">إرسال الطلب</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="appShell" class="hidden">
+<header><div><h1 data-i18n="brand">كراج حسن</h1><div class="sub" data-i18n="subtitle">إدارة السيارات والفواتير والمخزون</div><div class="sub" style="margin-top:2px;font-weight:800">V4.0 Test</div></div><div class="head-actions"><span id="userChip" class="user-chip"></span><button id="logoutBtn" class="lang" type="button" onclick="hardLogout(event)" data-i18n="logout">خروج</button><div class="language-switch"><button id="langArBtn" class="lang" type="button" onclick="setLanguage('ar')">عربي</button><button id="langEnBtn" class="lang" type="button" onclick="setLanguage('en')">English</button></div></div></header>
+<div class="wrap">
+  <div class="tabs no-print">
+    <button class="tab active" data-tab="dashboard">🏠 <span data-i18n="dashboard">الرئيسية</span></button>
+    <button class="tab" data-tab="inside">🔴 <span data-i18n="insideGarage">دخول السيارة</span></button>
+    <button class="tab" data-tab="exited">✅ <span data-i18n="exitTab">خروج</span></button>
+    <button class="tab" data-tab="bookings">📅 <span data-i18n="bookings">الحجوزات</span></button>
+    <button class="tab" data-tab="intake">➕ <span data-i18n="intake">دخول سيارة</span></button>
+    <button class="tab mechanic-only hidden" data-tab="worker">🔧 <span data-i18n="myWork">شغلي</span></button>
+    <button class="tab" data-tab="jobs">🚗 <span data-i18n="jobs">السيارات والفواتير</span></button>
+    <button class="tab" data-tab="archive">🗂️ <span data-i18n="archive">الأرشيف</span></button>
+    <button class="tab" data-tab="inventory">➕ <span data-i18n="addInventory">إضافة مخزون</span></button>
+    <button class="tab" data-tab="sales">📦 <span data-i18n="stockSales">المخزون / البيع</span></button>
+    <button class="tab admin-only" data-tab="reports">📊 <span data-i18n="reports">التوتال</span></button>
+    <button class="tab admin-only" data-tab="admin">👥 <span data-i18n="admin">الإدارة</span></button>
+    <button class="tab" data-tab="backup">💾 <span data-i18n="backup">نسخة</span></button>
+  </div>
+
+  <section id="dashboard" class="panel active"><div class="grid">
+    <div class="card quarter"><div class="muted" data-i18n="pendingRequests">طلبات معلّقة</div><div id="statPending" class="stat">0</div></div>
+    <div class="card quarter"><div class="muted" data-i18n="carsOpen">سيارات داخل الغاراج</div><div id="statOpen" class="stat">0</div></div>
+    <div class="card quarter"><div class="muted" data-i18n="stockCount">مواد بالمخزون</div><div id="statStock" class="stat">0</div><div id="statLowStock" class="muted"></div></div>
+    <div class="card quarter"><div class="muted" data-i18n="todayWorkTotal">إجمالي شغل اليوم</div><div id="statTodayTotal" class="stat">D 0</div><div id="statTodayDate" class="muted"></div></div>
+    <div class="card"><h3 data-i18n="recentActivity">آخر النشاطات</h3><div id="recentAudit"></div></div>
+  </div></section>
+
+  <section id="inside" class="panel"><div class="grid">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div>
+          <h2 style="margin-bottom:4px" data-i18n="insideGarage">دخول السيارة</h2>
+          <div class="muted" data-i18n="insideGarageHelp">السيارات الموجودة حالياً داخل الغاراج. بعد الحفظ تنتقل السيارة إلى هنا مباشرة.</div>
+        </div>
+        <div><span class="garage-dot"></span><b id="insideCarsCount">0 سيارة</b></div>
+      </div>
+      <div id="insideCarsList" style="margin-top:14px"></div>
+    </div>
+  </div></section>
+
+  
+  <section id="exited" class="panel"><div class="grid">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div>
+          <h2 style="margin-bottom:4px" data-i18n="exitedVehicles">خروج السيارات</h2>
+          <div class="muted" data-i18n="exitedVehiclesHelp">السيارة التي تعمل لها خروج تختفي من دخول السيارة وتنتقل إلى هنا مباشرة.</div>
+        </div>
+        <div><b id="exitedCarsCount">0 سيارة</b></div>
+      </div>
+      <div id="exitedCarsList" style="margin-top:14px"></div>
+    </div>
+  </div></section>
+
+  <section id="bookings" class="panel"><div class="grid">
+    <div class="card half"><h2 data-i18n="advanceBooking">حجز سيارة مسبق</h2><div class="row"><div><label data-i18n="customer">اسم الزبون</label><input id="bCustomer" /></div><div><label data-i18n="phoneOnly">الهاتف</label><input id="bPhone" /></div><div><label data-i18n="plate">رقم اللوحة</label><input id="bPlate" /></div><div><label data-i18n="car">السيارة</label><input id="bCar" /></div><div><label data-i18n="expectedDate">التاريخ المتوقع</label><input id="bDate" type="date" /></div><div><label data-i18n="expectedTime">الوقت المتوقع</label><input id="bTime" type="time" /></div></div><label style="margin-top:10px" data-i18n="problemRequest">المشكلة / الطلب</label><textarea id="bComplaint"></textarea><div class="actions"><button id="createBookingBtn" class="btn primary" data-i18n="registerRequest">تسجيل الطلب</button></div></div>
+    <div class="card half"><h2 data-i18n="customerCodeTitle">كود للزبون</h2><p class="muted" data-i18n="customerCodeHelp">الكود يُستخدم مرة واحدة لإرسال طلب سيارة. الطلب يبقى معلّقاً ولا يعني قبول السيارة.</p><div class="row"><div><label data-i18n="codeValidityHours">صلاحية الكود (ساعات)</label><input id="codeHours" type="number" value="24" min="1" max="168" /></div><div><label data-i18n="optionalNote">ملاحظة اختيارية</label><input id="codeNote" /></div></div><div class="actions"><button id="generateCodeBtn" class="btn primary" data-i18n="generateCode">إنشاء كود</button></div><div id="newCodeBox"></div></div>
+    <div class="card"><h2 data-i18n="vehicleRequests">طلبات السيارات</h2><input id="bookingSearch" class="search" data-i18n-placeholder="bookingSearchPlaceholder" placeholder="بحث بالاسم، الهاتف، اللوحة، السيارة أو الكود" /><div class="tablewrap"><table class="tbl"><thead><tr><th data-i18n="appointment">الموعد</th><th data-i18n="customerShort">الزبون</th><th data-i18n="car">السيارة</th><th data-i18n="status">الحالة</th><th data-i18n="createdBy">أنشأه</th><th data-i18n="action">إجراء</th></tr></thead><tbody id="bookingBody"></tbody></table></div></div>
+  </div></section>
+
+  <section id="intake" class="panel"><div class="card"><h2 data-i18n="newIntake">تسجيل سيارة جديدة</h2><div class="notice" data-i18n="intakeNotice">هذه الصفحة للسيارة الموجودة فعلياً عند بوابة الغاراج. للحجز المسبق استخدم صفحة الحجوزات.</div><div class="row3"><div><label data-i18n="customer">اسم الزبون</label><input id="customer" /></div><div><label data-i18n="phone">الهاتف / واتساب</label><input id="phone" required /></div><div><label data-i18n="plate">رقم اللوحة</label><input id="plate" required /></div><div><label data-i18n="make">الماركة</label><input id="make" /></div><div><label data-i18n="model">الموديل</label><input id="model" /></div><div><label data-i18n="year">السنة</label><input id="year" /></div><div><label data-i18n="color">لون السيارة</label><input id="color" /></div><div><label data-i18n="vin">VIN / رقم الهيكل</label><input id="vin" /></div></div><div style="margin-top:10px"><label data-i18n="assignedWorker">العامل المستلم</label><select id="intakeWorker"></select><div class="muted" data-i18n="workerWhatsAppHint">إذا اخترت شغيل وعنده واتساب، يمكن إرسال رسالة جاهزة له بعد حفظ السيارة.</div></div><div class="row" style="margin-top:10px"><div><label data-i18n="complaint">العطل / طلب الزبون</label><textarea id="complaint"></textarea></div><div><label data-i18n="notes">ملاحظات عند الدخول</label><textarea id="entryNotes"></textarea></div></div><div class="row3" style="margin-top:10px"><div id="parkingFeeWrap"><label data-i18n="parking">رسم الدخول / الباركينغ (D)</label><input id="parkingFee" type="number" value="100" /></div><div><label data-i18n="dateIn">تاريخ الدخول</label><input id="dateIn" type="date" /></div><div><label data-i18n="timeIn">وقت الدخول</label><input id="timeIn" type="time" /></div></div><div class="actions"><button id="saveIntake" class="btn primary" data-i18n="saveVehicle">حفظ السيارة</button></div></div></section>
+
+
+  <section id="worker" class="panel"><div class="grid"><div class="card"><h2 data-i18n="myWork">شغلي</h2><p class="muted" data-i18n="workerPageHelp">هنا تظهر السيارات المسلّمة لك فقط. يمكنك بدء العمل، إرسال بلاغ عطل بصورة، طلب قطع، أو إنهاء العمل.</p><div id="workerJobs"></div></div></div></section>
+  <section id="jobs" class="panel"><div class="card"><h2 data-i18n="carsInvoices">السيارات والفواتير</h2><input id="jobSearch" class="search" data-i18n-placeholder="searchPlaceholder" /><div class="tablewrap"><table class="tbl"><thead><tr><th data-i18n="date">التاريخ</th><th data-i18n="customerShort">الزبون</th><th data-i18n="car">السيارة</th><th data-i18n="plateShort">اللوحة</th><th data-i18n="assignedWorker">العامل المستلم</th><th data-i18n="status">الحالة</th><th data-i18n="total">المجموع</th><th data-i18n="action">إجراء</th></tr></thead><tbody id="jobsBody"></tbody></table></div></div></section>
+
+  <section id="archive" class="panel"><div class="grid">
+    <div class="card"><h2 data-i18n="annualArchive">الأرشيف السنوي للسيارات</h2><p class="muted" data-i18n="archiveHelp">كل سيارة تبقى محفوظة ويمكن فتح ملفها الكامل والفاتورة لاحقاً.</p><div class="row3"><div><label data-i18n="archiveYear">السنة</label><select id="archiveYear"></select></div><div><label data-i18n="archiveMonth">الشهر</label><select id="archiveMonth"></select></div><div><label data-i18n="searchArchive">بحث</label><input id="archiveSearch" data-i18n-placeholder="archiveSearchPlaceholder" /></div></div><div id="monthSummary" class="actions" style="margin-top:14px"></div></div>
+    <div class="card"><div class="tablewrap"><table class="tbl"><thead><tr><th data-i18n="dateIn">تاريخ الدخول</th><th data-i18n="dateOut">تاريخ الخروج</th><th data-i18n="customerShort">الزبون</th><th data-i18n="car">السيارة</th><th data-i18n="plateShort">اللوحة</th><th data-i18n="vin">VIN / رقم الهيكل</th><th data-i18n="status">الحالة</th><th data-i18n="total">المجموع</th><th data-i18n="action">إجراء</th></tr></thead><tbody id="archiveBody"></tbody></table></div></div>
+  </div></section>
+
+  <section id="inventory" class="panel"><div class="grid">
+    <div class="card">
+      <h2 data-i18n="addInventory">إضافة مخزون</h2>
+      <div class="notice" data-i18n="addInventoryHelpSimple">هذه الصفحة لإضافة صنف جديد أو زيادة كميته.</div>
+      <div class="row3">
+        <div><label data-i18n="item">اسم القطعة</label><input id="stockName" /></div>
+        <div><label data-i18n="sku">الكود</label><input id="stockSku" /></div>
+        <div><label data-i18n="qty">الكمية</label><input id="stockQty" type="number" value="1" min="1" /></div>
+        <div><label data-i18n="cost">سعر الشراء (D)</label><input id="stockCost" type="number" value="0" min="0" /></div>
+        <div><label data-i18n="sell">سعر البيع (D)</label><input id="stockSell" type="number" value="0" min="0" /></div>
+        <div><label data-i18n="lowStockLevel">حد تنبيه المخزون</label><input id="stockMin" type="number" value="2" min="0" /></div>
+      </div>
+      <div class="actions">
+        <button id="addStockBtn" class="btn primary" data-i18n="add">إضافة</button>
+      </div>
+      <div class="muted" style="margin-top:8px" data-i18n="sameSkuHelp">إذا كان الكود موجوداً مسبقاً، تزيد الكمية على نفس الصنف ولا ينشأ صنف مكرر.</div>
+    </div>
+  </div></section>
+
+  <section id="sales" class="panel"><div class="grid">
+    <div class="card half">
+      <h2 data-i18n="sellFromStock">بيع من المخزون</h2>
+      <div class="notice" data-i18n="largeStockHelp">لأن عندك أكثر من 1000 صنف، استخدم البحث بالاسم أو الكود للوصول للصنف بسرعة.</div>
+      <label data-i18n="searchPart">بحث عن قطعة</label>
+      <input id="saleSearch" data-i18n-placeholder="stockSearchPlaceholder" placeholder="اسم القطعة أو الكود..." autocomplete="off" />
+      <div id="saleSearchResults" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card half">
+      <h2 data-i18n="saleCart">سلة البيع</h2>
+      <div id="saleCart"></div>
+      <div class="row" style="margin-top:12px">
+        <div><label data-i18n="optionalCustomer">اسم الزبون (اختياري)</label><input id="saleCustomer" /></div>
+        <div><label data-i18n="paymentMethod">طريقة الدفع</label><select id="salePayment"><option value="cash" data-i18n="cash">كاش</option><option value="mobile" data-i18n="mobileTransfer">موبايل / تحويل</option><option value="credit" data-i18n="credit">دين</option></select></div>
+      </div>
+      <div id="saleCartTotal" class="sale-cart-total">D 0</div>
+      <div class="actions">
+        <button id="completeSaleBtn" type="button" class="btn success" data-i18n="completeSale" onclick="return completeSaleNow(event)" ontouchend="event.preventDefault();return completeSaleNow(event)">إتمام البيع وطرح الكمية</button>
+        <button id="clearSaleBtn" class="btn secondary" data-i18n="clearCart">تفريغ السلة</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div><div class="muted" data-i18n="todaySales">مبيعات اليوم</div><div id="todaySalesTotal" class="big-kpi">D 0</div></div>
+        <div><div class="muted" data-i18n="todayTransactions">عدد عمليات اليوم</div><div id="todaySalesCount" class="big-kpi">0</div></div>
+      </div>
+      <h3 style="margin-top:18px" data-i18n="todaySalesActivity">حركة البيع اليوم</h3>
+      <div id="todaySalesList"></div>
+    </div>
+  </div></section>
+
+  
+  <section id="salesDone" class="panel">
+    <div class="card" style="text-align:center;padding:34px 18px">
+      <div style="font-size:64px;line-height:1">✅</div>
+      <h2 style="margin-top:16px" data-i18n="saleCompletedTitle">تم البيع</h2>
+      <div id="saleDoneAmount" style="font-size:30px;font-weight:900;margin:14px 0">D 0</div>
+      <div class="muted" data-i18n="saleCompletedHelp">تم تسجيل البيع وطرح الكمية من المخزون وإضافة القيمة إلى إجمالي اليوم.</div>
+      <div class="actions" style="justify-content:center;margin-top:20px">
+        <button id="newSaleBtn" type="button" class="btn primary" data-i18n="newSale">بيع جديد</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="reports" class="panel"><div class="grid">
+    <div class="card"><h2 data-i18n="reports">التوتال والإنتاج</h2><div class="row3"><div><label data-i18n="period">الفترة</label><select id="reportPeriod"><option value="today" data-i18n="todayPeriod">اليوم</option><option value="week" data-i18n="weekPeriod">هذا الأسبوع</option><option value="month" selected data-i18n="monthPeriod">هذا الشهر</option><option value="custom" data-i18n="customPeriod">من تاريخ إلى تاريخ</option></select></div><div><label data-i18n="fromDate">من</label><input id="reportFrom" type="date" /></div><div><label data-i18n="toDate">إلى</label><input id="reportTo" type="date" /></div></div><div class="actions"><button id="refreshReports" class="btn primary" data-i18n="refresh">تحديث</button></div></div>
+    <div class="card half"><div class="muted" data-i18n="garageLaborTotal">إجمالي أجرة شغل الغاراج</div><div id="reportLaborTotal" class="big-kpi">D 0</div><div id="reportCarsCount" class="muted"></div></div>
+    <div class="card half"><div class="muted" data-i18n="garageInvoiceTotal">إجمالي الفواتير</div><div id="reportInvoiceTotal" class="big-kpi">D 0</div><div id="reportBalanceTotal" class="muted"></div></div>
+    <div class="card"><h3 data-i18n="workerProduction">إنتاج الشغيلة</h3><div class="muted" data-i18n="laborOnlyNote">إنتاج الشغيل محسوب من أجرة اليد فقط. إذا وزّعت الأجرة بين أكثر من شغيل، يُحسب لكل واحد حصته.</div><div id="workerProductionList"></div></div>
+  </div></section>
+  <section id="admin" class="panel"><div class="grid"><div class="card half"><h2 data-i18n="addEmployee">إضافة موظف</h2><div class="row"><div><label data-i18n="name">الاسم</label><input id="uName" /></div><div><label data-i18n="workerPhone">رقم واتساب</label><input id="uPhone" inputmode="tel" /></div><div><label data-i18n="username">اسم المستخدم</label><input id="uUsername" /></div><div><label data-i18n="passwordPin">كلمة المرور / الرقم السري</label><input id="uPassword" /></div><div><label data-i18n="userType">نوع المستخدم</label><select id="uRole"><option value="employee" data-i18n="intakeEmployee">موظف إدخال</option><option value="mechanic" data-i18n="mechanicRole">شغيل / ميكانيكي</option><option value="seller" data-i18n="sellerRole">بائع مخزون</option></select></div></div><div class="notice" style="margin-top:12px" data-i18n="intakeOnlyPermission">هذا الموظف يستطيع فقط إدخال سيارة جديدة. لا يستطيع رؤية السيارات السابقة أو الفواتير أو المخزون أو التقارير أو الإنتاج.</div><div class="actions"><button id="addUserBtn" class="btn primary" data-i18n="addEmployeeButton">إضافة الموظف</button></div></div><div class="card half"><h2 data-i18n="employees">الموظفون</h2><div id="usersList"></div></div><div class="card"><h2 data-i18n="activityLog">سجل العمليات</h2><div id="auditList"></div></div></div></section>
+
+  <section id="backup" class="panel"><div class="card"><h2 data-i18n="backupTitle">نسخة احتياطية</h2><p class="muted" data-i18n="backupHelp">النسخة تشمل السيارات، الحجوزات، الموظفين، الأكواد والمخزون على هذا الجهاز.</p><div class="actions"><button id="exportBtn" class="btn primary" data-i18n="export">تنزيل نسخة</button><label class="btn secondary"><span data-i18n="import">استرجاع نسخة</span><input id="importFile" type="file" accept="application/json" hidden /></label></div></div></section>
+
+  <section id="editor" class="panel"><div class="grid"><div class="card half"><h2 data-i18n="jobDetails">تفاصيل السيارة</h2><div id="editorInfo"></div><div class="row" style="margin-top:12px"><div><label data-i18n="color">لون السيارة</label><input id="editColor" /></div><div><label data-i18n="vin">VIN / رقم الهيكل</label><input id="editVin" /></div></div><div class="row" style="margin-top:10px"><div><label data-i18n="dateIn">تاريخ الدخول</label><input id="editDateIn" type="date" /></div><div><label data-i18n="timeIn">وقت الدخول</label><input id="editTimeIn" type="time" /></div></div><div class="row" style="margin-top:10px"><div><label data-i18n="dateOut">تاريخ الخروج</label><input id="dateOut" type="date" /></div><div><label data-i18n="timeOut">وقت الخروج</label><input id="timeOut" type="time" /></div></div><div style="margin-top:12px"><label data-i18n="assignedWorker">العامل المستلم</label><select id="assignedWorker"></select></div><div style="margin-top:12px"><label data-i18n="workDone">الشغل المنجز</label><textarea id="workDone"></textarea></div><div class="row3" style="margin-top:10px"><div><label data-i18n="labor">أجرة اليد (D)</label><input id="labor" type="number" value="0" /></div><div><label data-i18n="discount">خصم (D)</label><input id="discount" type="number" value="0" /></div><div><label data-i18n="paid">المدفوع (D)</label><input id="paid" type="number" value="0" /></div></div><div style="margin-top:10px"><label data-i18n="status">الحالة</label><select id="status"><option value="open" data-i18n="open">داخل الغاراج</option><option value="ready" data-i18n="ready">جاهزة</option><option value="delivered" data-i18n="delivered">تم التسليم</option></select></div><div class="actions"><button id="saveJob" class="btn primary" data-i18n="save">حفظ</button><button id="exitJobBtn" type="button" class="btn danger" data-i18n="exitVehicle" onclick="return exitVehicleNow(event)" ontouchend="event.preventDefault();return exitVehicleNow(event)">خروج السيارة</button><button id="workerWhatsAppBtn" class="btn success" data-i18n="whatsappWorker">واتساب الشغيل</button></div></div><div class="card half"><h2 data-i18n="changedParts">القطع التي تم تغييرها</h2><div id="changedPartsList"></div><div class="actions"><button id="addChangedPartBtn" class="btn secondary" data-i18n="addChangedPart">إضافة قطعة تم تغييرها</button></div></div><div class="card half"><h2 data-i18n="faultReports">بلاغات الأعطال</h2><div class="row"><div><label data-i18n="faultCode">كود العطل</label><input id="faultCode" placeholder="P0300" /></div><div><label data-i18n="faultPhoto">صورة العطل</label><input id="faultPhoto" type="file" accept="image/*" capture="environment" /></div></div><label style="margin-top:10px" data-i18n="faultNote">شرح العطل</label><textarea id="faultNote"></textarea><div class="actions"><button id="addFaultBtn" class="btn warning" data-i18n="addFault">حفظ بلاغ العطل</button></div><div id="faultReportsList"></div></div>
+<div class="card half"><h2 data-i18n="laborSplit">توزيع أجرة الشغل</h2><div class="row"><div><label data-i18n="assignedWorker">الشغيل</label><select id="splitWorker"></select></div><div><label data-i18n="splitAmount">حصة الشغيل (D)</label><input id="splitAmount" type="number" value="0" /></div></div><div class="actions"><button id="addSplitBtn" class="btn secondary" data-i18n="addSplit">إضافة حصة</button></div><div id="laborSplitsList"></div></div>
+<div class="card half"><h2 data-i18n="partsRequests">طلبات القطع</h2><div id="partsRequestsList"></div></div><div class="card"><h2 data-i18n="invoiceItems">بنود الفاتورة</h2><div id="linesList"></div><div class="actions"><button id="addLineBtn" class="btn secondary" data-i18n="addPart">إضافة قطعة/خدمة للفاتورة</button><button id="showInvoice" class="btn success" data-i18n="viewInvoice">عرض الفاتورة</button><button id="whatsappBtn" class="btn success" data-i18n="whatsapp">واتساب</button><button id="backJobs" class="btn secondary" data-i18n="back">رجوع</button></div></div></div></section>
+
+  <section id="invoicePanel" class="panel"><div class="card invoice"><div class="invoice-head"><div><h2 data-i18n="brand">كراج حسن</h2><div class="muted" data-i18n="invoice">فاتورة</div><div class="muted">+220 779 9666</div></div><div id="invMeta"></div></div><div id="invCustomer" style="margin-top:14px"></div><div id="invWork" style="margin-top:14px"></div><table><thead><tr><th data-i18n="description">الوصف</th><th data-i18n="qty">الكمية</th><th data-i18n="price">السعر</th><th data-i18n="subtotal">المجموع</th></tr></thead><tbody id="invLines"></tbody></table><div id="invTotals" style="margin-top:14px"></div><div class="footer-note" data-i18n="thanks">شكراً لاختياركم كراج حسن.</div><div class="actions no-print"><button class="btn primary" onclick="window.print()" data-i18n="print">طباعة / PDF</button><button id="closeInvoice" class="btn secondary" data-i18n="back">رجوع</button></div></div></section>
+</div></div>
+<script>
+const KEY='hassanGarageDataV2';
+const LEGACY='hassanGarageDataV1';
+const nowIso=()=>new Date().toISOString();
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const timeNow=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+const $=id=>document.getElementById(id);
+const esc=v=>String(v||'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const money=n=>'D '+Number(n||0).toLocaleString(undefined,{maximumFractionDigits:2});
+function defaults(){return {jobs:[],stock:[],sales:[],bookings:[],codes:[],audit:[],users:[{id:'u-admin',name:'Hassan',phone:'+2207799666',username:'admin',password:'1234',role:'admin',canApprove:true,active:true}]};}
+let data;
+try{data=JSON.parse(localStorage.getItem(KEY)||'null');}catch{}
+if(!data){let old;try{old=JSON.parse(localStorage.getItem(LEGACY)||'null')}catch{} data=defaults();if(old){data.jobs=old.jobs||[];data.stock=old.stock||[];}}
+for(const k of ['jobs','stock','sales','bookings','codes','audit','users']) if(!Array.isArray(data[k])) data[k]=defaults()[k];
+data.jobs.forEach(j=>{if(!Array.isArray(j.changedParts))j.changedParts=[];if(!Array.isArray(j.faultReports))j.faultReports=[];if(!Array.isArray(j.laborSplits))j.laborSplits=[];if(!Array.isArray(j.partsRequests))j.partsRequests=[];if(typeof j.paid==='undefined')j.paid=0;if(typeof j.startedAt==='undefined')j.startedAt='';if(typeof j.finishedByWorkerAt==='undefined')j.finishedByWorkerAt='';if(typeof j.assignedWorkerId==='undefined')j.assignedWorkerId='';if(typeof j.assignedWorkerName==='undefined')j.assignedWorkerName='';if(typeof j.color==='undefined')j.color='';if(typeof j.vin==='undefined')j.vin='';if(typeof j.timeIn==='undefined')j.timeIn='';if(typeof j.dateOut==='undefined')j.dateOut='';if(typeof j.timeOut==='undefined')j.timeOut='';});data.stock.forEach(x=>{if(typeof x.minQty==='undefined')x.minQty=2});data.users.forEach(u=>{if(typeof u.phone==='undefined')u.phone=''});data.sales.forEach(s=>{if(!Array.isArray(s.lines))s.lines=[];});
+data.users.forEach(u=>{if(u.role==='employee'){u.permissions=['intake'];u.canApprove=false;}if(u.role==='mechanic'){u.permissions=['worker'];u.canApprove=false;}if(u.role==='seller'){u.permissions=['sales'];u.canApprove=false;}});
+let currentUser=null,currentId=null,activeCustomerCode=null,lastListTab='jobs',lang=(localStorage.getItem('hassanLang')==='en'?'en':'ar');
+const t={
+ ar:{
+  brand:'كراج حسن',authSubtitle:'نظام دخول الموظفين وحجز السيارات',staffLoginMode:'دخول الموظفين',customerCodeMode:'كود الزبون',username:'اسم المستخدم',passwordPin:'كلمة المرور / الرقم السري',rememberLogin:'حفظ اسم المستخدم وكلمة المرور على هذا الجهاز',rememberLoginHint:'استخدم هذا الخيار فقط على جهازك الشخصي.',login:'دخول',firstRun:'أول تشغيل',changePasswordHint:'غيّر كلمة السر من صفحة الإدارة بعد التجربة.',customerCode:'كود الزبون',customerCodeExample:'مثال: HG-482913',openRequest:'فتح الطلب',name:'الاسم',phoneOnly:'الهاتف',plate:'رقم اللوحة',car:'السيارة',carExample:'مثال: تويوتا كورولا 2018',problem:'المشكلة',requestedDate:'التاريخ المطلوب',requestedTime:'الوقت المطلوب',submitRequest:'إرسال الطلب',
+  subtitle:'إدارة السيارات والفواتير والمخزون',insideGarage:'دخول السيارة',insideGarageHelp:'السيارات الموجودة حالياً داخل الغاراج. بعد الحفظ تنتقل السيارة إلى هنا مباشرة.',exitTab:'خروج',exitedVehicles:'خروج السيارات',exitedVehiclesHelp:'السيارة التي تعمل لها خروج تختفي من دخول السيارة وتنتقل إلى هنا مباشرة.',addInventory:'إضافة مخزون',addInventoryHelp:'هذه الصفحة فقط لإضافة صنف أو زيادة كميته. بعد الضغط على إضافة تنتقل مباشرة إلى صفحة المخزون / البيع.',addInventoryHelpSimple:'أضف الصنف واضغط إضافة. بعد الحفظ تفضى الخانات وتنتقل مباشرة إلى المخزون / البيع.',addAndGoStock:'إضافة والذهاب للمخزون',sameSkuHelp:'إذا كان الكود موجوداً مسبقاً، تزيد الكمية على نفس الصنف ولا ينشأ صنف مكرر.',stockSales:'المخزون / البيع',sellFromStock:'بيع من المخزون',largeStockHelp:'لأن عندك أكثر من 1000 صنف، استخدم البحث بالاسم أو الكود للوصول للصنف بسرعة.',searchPart:'بحث عن قطعة',stockSearchPlaceholder:'اسم القطعة أو الكود...',saleCart:'سلة البيع',optionalCustomer:'اسم الزبون (اختياري)',paymentMethod:'طريقة الدفع',cash:'كاش',mobileTransfer:'موبايل / تحويل',credit:'دين',completeSale:'إتمام البيع وطرح الكمية',clearCart:'تفريغ السلة',todaySales:'مبيعات اليوم',todayTransactions:'عدد عمليات اليوم',todaySalesActivity:'حركة البيع اليوم',sellerRole:'بائع مخزون',stockKinds:'أصناف',stockUnits:'قطع',stockLow:'منخفض',searchToFindStock:'اكتب اسم القطعة أو الكود للبحث.',noMatchingStock:'لا يوجد صنف مطابق أو الكمية صفر.',inStock:'بالمخزون',addToCart:'إضافة',noMoreStock:'لا توجد كمية أكثر في المخزون',qtyOverStock:'الكمية المطلوبة أكبر من الموجود بالمخزون',emptyCart:'السلة فاضية.',unitPrice:'للحبة',noSalesToday:'لا توجد مبيعات اليوم.',insufficientStock:'الكمية غير كافية للصنف',saleDone:'تم البيع وطرح الكمية من المخزون',saleCompletedTitle:'تم البيع',saleCompletedHelp:'تم تسجيل البيع وطرح الكمية من المخزون وإضافة القيمة إلى إجمالي اليوم.',newSale:'بيع جديد',stockAddedGoSales:'تمت إضافة المخزون والانتقال إلى صفحة البيع',results:'نتيجة',showingFirst100:'عرض أول 100 من',typeSearchNarrow:'اكتب بالبحث لتحديد الصنف بسرعة.',logout:'خروج',dashboard:'الرئيسية',bookings:'الحجوزات',intake:'دخول سيارة',jobs:'السيارات والفواتير',archive:'الأرشيف السنوي',inventory:'المخزون',admin:'الإدارة',backup:'نسخة احتياطية',reports:'التوتال',myWork:'شغلي',pendingRequests:'طلبات معلّقة',carsOpen:'سيارات داخل الغاراج',stockCount:'مواد بالمخزون',todayWorkTotal:'إجمالي اليوم',dailyWorkTotal:'إجمالي شغل اليوم',recentActivity:'آخر النشاطات',
+  advanceBooking:'حجز سيارة مسبق',customer:'اسم الزبون',expectedDate:'التاريخ المتوقع',expectedTime:'الوقت المتوقع',problemRequest:'المشكلة / الطلب',registerRequest:'تسجيل الطلب',customerCodeTitle:'كود للزبون',customerCodeHelp:'الكود يُستخدم مرة واحدة لإرسال طلب سيارة. الطلب يبقى معلّقاً ولا يعني قبول السيارة.',codeValidityHours:'صلاحية الكود (ساعات)',optionalNote:'ملاحظة اختيارية',generateCode:'إنشاء كود',vehicleRequests:'طلبات السيارات',bookingSearchPlaceholder:'بحث بالاسم، الهاتف، اللوحة، السيارة أو الكود',appointment:'الموعد',customerShort:'الزبون',createdBy:'أنشأه',action:'إجراء',
+  newIntake:'تسجيل سيارة جديدة',intakeNotice:'هذه الصفحة للسيارة الموجودة فعلياً عند بوابة الغاراج. للحجز المسبق استخدم صفحة الحجوزات.',phone:'الهاتف / واتساب',make:'الماركة',model:'الموديل',year:'السنة',complaint:'العطل / طلب الزبون',notes:'ملاحظات عند الدخول',parking:'رسم الدخول / الباركينغ (D)',dateIn:'تاريخ الدخول',timeIn:'وقت الدخول',dateOut:'تاريخ الخروج',timeOut:'وقت الخروج',color:'لون السيارة',vin:'VIN / رقم الهيكل',saveVehicle:'حفظ السيارة',workerWhatsAppHint:'إذا اخترت شغيل وعنده رقم واتساب، يمكن إرسال رسالة جاهزة له بعد حفظ السيارة.',
+  carsInvoices:'السيارات والفواتير',searchPlaceholder:'بحث بالاسم، الهاتف، اللوحة، VIN أو السيارة',annualArchive:'الأرشيف السنوي للسيارات',archiveHelp:'كل سيارة تبقى محفوظة في السجل ويمكن فتح ملفها وفاتورتها والشغل الذي تم عليها لاحقاً.',archiveYear:'السنة',archiveMonth:'الشهر',searchArchive:'بحث',archiveSearchPlaceholder:'بحث بالاسم، الهاتف، اللوحة، VIN، اللون أو السيارة',allYears:'كل السنوات',allMonths:'كل الأشهر',openFile:'فتح الملف',tapToOpen:'اضغط على الاسم لفتح ملف السيارة',date:'التاريخ',plateShort:'اللوحة',status:'الحالة',m1:'يناير',m2:'فبراير',m3:'مارس',m4:'أبريل',m5:'مايو',m6:'يونيو',m7:'يوليو',m8:'أغسطس',m9:'سبتمبر',m10:'أكتوبر',m11:'نوفمبر',m12:'ديسمبر',total:'المجموع',addStock:'إضافة للمخزون',item:'اسم القطعة',sku:'الكود',qty:'الكمية',cost:'سعر الشراء (D)',sell:'سعر البيع (D)',add:'إضافة',stockList:'قائمة المخزون',lowStockLevel:'حد تنبيه المخزون',lowStock:'مخزون منخفض',
+  addEmployee:'إضافة موظف',approvePermission:'السماح بقبول/رفض السيارات',no:'لا',yes:'نعم',intakeOnlyPermission:'هذا الموظف يستطيع فقط إدخال سيارة جديدة. لا يستطيع رؤية السيارات السابقة أو الفواتير أو المخزون أو التقارير أو الإنتاج.',intakeOnly:'إدخال سيارات فقط',vehicleSaved:'تم حفظ السيارة بنجاح.',addEmployeeButton:'إضافة الموظف',employees:'الموظفون',activityLog:'سجل العمليات',workerPhone:'رقم واتساب',userType:'نوع المستخدم',intakeEmployee:'موظف إدخال',mechanicRole:'شغيل / ميكانيكي',backupTitle:'نسخة احتياطية',backupHelp:'النسخة تشمل السيارات، الحجوزات، الموظفين، الأكواد، المخزون والمبيعات على هذا الجهاز.',export:'تنزيل نسخة',import:'استرجاع نسخة',
+  jobDetails:'تفاصيل السيارة',assignedWorker:'العامل المستلم',unassignedWorker:'غير محدد',workDone:'الشغل المنجز',changedParts:'القطع التي تم تغييرها',addChangedPart:'إضافة قطعة تم تغييرها',changedPartNamePrompt:'اسم القطعة التي تم تغييرها',changedPartNotePrompt:'ملاحظة عن القطعة (اختياري)',changedPartBy:'العامل',removeChangedPartConfirm:'هل تريد حذف هذه القطعة من سجل الشغل؟',labor:'أجرة اليد (D)',discount:'خصم (D)',paid:'المدفوع (D)',balance:'الباقي',open:'داخل الغاراج',ready:'جاهزة',delivered:'تم التسليم',save:'حفظ',addPart:'إضافة قطعة/خدمة للفاتورة',invoiceItems:'بنود الفاتورة',viewInvoice:'عرض الفاتورة',whatsapp:'واتساب',back:'رجوع',exitVehicle:'خروج السيارة',whatsappWorker:'واتساب الشغيل',faultReports:'بلاغات الأعطال',faultCode:'كود العطل',faultNote:'شرح العطل',faultPhoto:'صورة العطل',addFault:'حفظ بلاغ العطل',laborSplit:'توزيع أجرة الشغل',splitAmount:'حصة الشغيل (D)',addSplit:'إضافة حصة',partsRequests:'طلبات القطع',workerPageHelp:'هنا تظهر السيارات المسلّمة لك فقط. يمكنك بدء العمل، إرسال بلاغ عطل بصورة، طلب قطع، أو إنهاء العمل.',startWork:'بدء العمل',requestParts:'قطع مطلوبة',finishWork:'انتهيت من السيارة',reportFault:'بلاغ عطل',period:'الفترة',todayPeriod:'اليوم',weekPeriod:'هذا الأسبوع',monthPeriod:'هذا الشهر',customPeriod:'من تاريخ إلى تاريخ',fromDate:'من',toDate:'إلى',refresh:'تحديث',garageLaborTotal:'إجمالي أجرة شغل الغاراج',garageInvoiceTotal:'إجمالي الفواتير',workerProduction:'إنتاج الشغيلة',laborOnlyNote:'إنتاج الشغيل محسوب من أجرة اليد فقط. وإذا تم توزيع الأجرة بين أكثر من شغيل، يُحسب لكل واحد حصته.',invoiceCount:'عدد السيارات',paidTotal:'المدفوع',balanceTotal:'الباقي',invoice:'فاتورة',description:'الوصف',price:'السعر',subtotal:'المجموع',thanks:'شكراً لاختياركم كراج حسن.',print:'طباعة / PDF',edit:'فتح',delete:'حذف',parkingFee:'رسم الدخول',laborFee:'أجرة اليد',discountLabel:'الخصم',grandTotal:'الإجمالي',noData:'لا يوجد بيانات بعد',
+  pending:'معلّق',approved:'مقبول',rejected:'مرفوض',arrived:'وصلت السيارة',details:'تفاصيل',accept:'قبول',reject:'رفض',markArrived:'وصلت السيارة',noRequests:'لا توجد طلبات',validUntil:'صالح حتى',oneUse:'استعمال واحد',created:'تم الإنشاء',source:'المصدر',requestCode:'كود الطلب',decision:'القرار',
+  adminRole:'مدير',employeeRole:'موظف',mechanicRole:'شغيل / ميكانيكي',customerRole:'زبون',approval:'صلاحية القبول',active:'فعّال',disabled:'معطّل',enable:'تفعيل',disable:'تعطيل',enteredBy:'أدخلها',
+  invalidLogin:'اسم المستخدم أو كلمة المرور غير صحيحة',enterCustomerOrPlate:'أدخل اسم الزبون أو رقم اللوحة',enterNameOrPlate:'أدخل الاسم أو رقم اللوحة',codeNotFound:'الكود غير موجود',codeUsed:'هذا الكود تم استخدامه',codeExpired:'انتهت صلاحية الكود',requestSent:'تم إرسال الطلب. السيارة غير مقبولة بعد، انتظر موافقة الغاراج.',noApprovalPermission:'ليس لديك صلاحية قبول أو رفض السيارات',
+  partOrServicePrompt:'اسم القطعة أو الخدمة',quantityPrompt:'الكمية',pricePrompt:'السعر بالدالاسي',deletePartConfirm:'هل تريد حذف القطعة؟',enterEmployeeFields:'أدخل الاسم واسم المستخدم وكلمة المرور',usernameUsed:'اسم المستخدم مستخدم بالفعل',backupRestored:'تم استرجاع النسخة',invalidFile:'الملف غير صالح',
+  hello:'مرحباً',invoiceMessage:'فاتورة كراج حسن',carLabel:'السيارة',totalLabel:'الإجمالي',fromBooking:'من الحجز',
+  LOGIN:'تسجيل دخول',LOGOUT:'تسجيل خروج',BOOKING_CREATED:'إنشاء طلب سيارة',CUSTOMER_CODE_CREATED:'إنشاء كود للزبون',CUSTOMER_CODE_USED:'استخدام كود الزبون',BOOKING_APPROVED:'قبول طلب سيارة',BOOKING_REJECTED:'رفض طلب سيارة',VEHICLE_ARRIVED:'وصول السيارة',DIRECT_INTAKE:'إدخال سيارة مباشرة',JOB_UPDATED:'تحديث بيانات السيارة',WORKER_ASSIGNED:'تسليم السيارة لعامل',CHANGED_PART_ADDED:'إضافة قطعة تم تغييرها',CHANGED_PART_REMOVED:'حذف قطعة من سجل الشغل',INVOICE_LINE_ADDED:'إضافة بند للفاتورة',INVOICE_LINE_REMOVED:'حذف بند من الفاتورة',STOCK_ADDED:'إضافة للمخزون',STOCK_DELETED:'حذف من المخزون',USER_CREATED:'إضافة موظف',USER_ENABLED:'تفعيل موظف',USER_DISABLED:'تعطيل موظف',FAULT_ADDED:'إضافة بلاغ عطل',PARTS_REQUESTED:'طلب قطع',WORK_STARTED:'بدء شغل السيارة',WORK_FINISHED:'إنهاء الشغل',LABOR_SPLIT_ADDED:'توزيع أجرة الشغل',VEHICLE_EXITED:'خروج السيارة',BACKUP_RESTORED:'استرجاع نسخة احتياطية',noActivity:'لا يوجد نشاط بعد'
+ },
+ en:{
+  brand:'Hassan Garage',authSubtitle:'Staff login and vehicle booking system',staffLoginMode:'Staff Login',customerCodeMode:'Customer Code',username:'Username',passwordPin:'Password / PIN',rememberLogin:'Remember username and password on this device',rememberLoginHint:'Use this option only on your personal device.',login:'Login',firstRun:'First login',changePasswordHint:'Change the password from the Admin page after testing.',customerCode:'Customer Code',customerCodeExample:'Example: HG-482913',openRequest:'Open Request',name:'Name',phoneOnly:'Phone',plate:'Plate Number',car:'Vehicle',carExample:'Example: Toyota Corolla 2018',problem:'Problem',requestedDate:'Requested Date',requestedTime:'Requested Time',submitRequest:'Submit Request',
+  subtitle:'Cars, invoices and inventory management',insideGarage:'Vehicle Entry',insideGarageHelp:'Vehicles currently inside the garage. After saving, the vehicle appears here immediately.',exitTab:'Exit',exitedVehicles:'Exited Vehicles',exitedVehiclesHelp:'When a vehicle is marked as exited, it disappears from Vehicle Entry and moves here immediately.',addInventory:'Add Inventory',addInventoryHelp:'This page is only for adding a new item or increasing its quantity. After Add, you go directly to Stock / Sales.',addInventoryHelpSimple:'Add the item and tap Add. After saving, the fields clear and you go directly to Stock / Sales.',addAndGoStock:'Add and Go to Stock',sameSkuHelp:'If the same code already exists, the quantity is added to that item instead of creating a duplicate.',stockSales:'Stock / Sales',sellFromStock:'Sell from Stock',largeStockHelp:'For 1000+ items, search by item name or code to find stock quickly.',searchPart:'Search Item',stockSearchPlaceholder:'Item name or code...',saleCart:'Sales Cart',optionalCustomer:'Customer Name (optional)',paymentMethod:'Payment Method',cash:'Cash',mobileTransfer:'Mobile / Transfer',credit:'Credit',completeSale:'Complete Sale and Deduct Stock',clearCart:'Clear Cart',todaySales:'Today Sales',todayTransactions:'Today Transactions',todaySalesActivity:'Today Sales Activity',sellerRole:'Stock Seller',stockKinds:'items',stockUnits:'units',stockLow:'low',searchToFindStock:'Type an item name or code to search.',noMatchingStock:'No matching item or quantity is zero.',inStock:'In stock',addToCart:'Add',noMoreStock:'No more quantity available in stock',qtyOverStock:'Requested quantity is greater than stock',emptyCart:'Cart is empty.',unitPrice:'each',noSalesToday:'No sales today.',insufficientStock:'Insufficient stock for item',saleDone:'Sale completed and stock deducted',saleCompletedTitle:'Sale Completed',saleCompletedHelp:'The sale was recorded, stock was deducted, and the amount was added to today’s total.',newSale:'New Sale',stockAddedGoSales:'Stock added. Opening Stock / Sales.',results:'results',showingFirst100:'Showing first 100 of',typeSearchNarrow:'Use search to narrow the results.',logout:'Logout',dashboard:'Dashboard',bookings:'Bookings',intake:'Vehicle Intake',jobs:'Cars & Invoices',archive:'Annual Archive',inventory:'Inventory',admin:'Admin',backup:'Backup',reports:'Totals',myWork:'My Work',pendingRequests:'Pending Requests',carsOpen:'Cars in Garage',stockCount:'Stock Items',todayWorkTotal:'Total Today',dailyWorkTotal:'Total Work',recentActivity:'Recent Activity',
+  advanceBooking:'Advance Vehicle Booking',customer:'Customer Name',expectedDate:'Expected Date',expectedTime:'Expected Time',problemRequest:'Problem / Request',registerRequest:'Create Request',customerCodeTitle:'Customer Code',customerCodeHelp:'The code can be used once to submit a vehicle request. The request stays pending and does not mean the vehicle is accepted.',codeValidityHours:'Code Validity (Hours)',optionalNote:'Optional Note',generateCode:'Generate Code',vehicleRequests:'Vehicle Requests',bookingSearchPlaceholder:'Search by name, phone, plate, vehicle or code',appointment:'Appointment',customerShort:'Customer',createdBy:'Created By',action:'Action',
+  newIntake:'New Vehicle Intake',intakeNotice:'Use this page only for a vehicle physically at the garage gate. Use Bookings for advance requests.',phone:'Phone / WhatsApp',make:'Make',model:'Model',year:'Year',complaint:'Complaint / Customer Request',notes:'Entry Notes',parking:'Entry / Parking Fee (D)',dateIn:'Date In',timeIn:'Time In',dateOut:'Date Out',timeOut:'Time Out',color:'Vehicle Color',vin:'VIN / Chassis Number',saveVehicle:'Save Vehicle',workerWhatsAppHint:'If you select a mechanic with WhatsApp, a ready message can be sent after saving the vehicle.',
+  carsInvoices:'Cars & Invoices',searchPlaceholder:'Search by name, phone, plate, VIN or vehicle',annualArchive:'Annual Vehicle Archive',archiveHelp:'Every vehicle stays in the archive so you can reopen its full record, invoice and work history later.',archiveYear:'Year',archiveMonth:'Month',searchArchive:'Search',archiveSearchPlaceholder:'Search by name, phone, plate, VIN, color or vehicle',allYears:'All Years',allMonths:'All Months',openFile:'Open File',tapToOpen:'Tap the name to open the vehicle file',date:'Date',plateShort:'Plate',status:'Status',m1:'January',m2:'February',m3:'March',m4:'April',m5:'May',m6:'June',m7:'July',m8:'August',m9:'September',m10:'October',m11:'November',m12:'December',total:'Total',addStock:'Add Inventory',item:'Part Name',sku:'Code',qty:'Quantity',cost:'Cost Price (D)',sell:'Selling Price (D)',add:'Add',stockList:'Inventory List',lowStockLevel:'Low Stock Alert Level',lowStock:'Low stock',
+  addEmployee:'Add Employee',approvePermission:'Allow Accepting / Rejecting Vehicles',no:'No',yes:'Yes',intakeOnlyPermission:'This employee can only enter a new vehicle. They cannot view previous vehicles, invoices, inventory, reports, or production.',intakeOnly:'Vehicle intake only',vehicleSaved:'Vehicle saved successfully.',addEmployeeButton:'Add Employee',employees:'Employees',activityLog:'Activity Log',workerPhone:'WhatsApp Number',userType:'User Type',intakeEmployee:'Vehicle Intake Employee',mechanicRole:'Mechanic',backupTitle:'Backup',backupHelp:'This backup includes vehicles, bookings, employees, codes, inventory and sales stored on this device.',export:'Download Backup',import:'Restore Backup',
+  jobDetails:'Vehicle Details',assignedWorker:'Assigned Worker',unassignedWorker:'Not Assigned',workDone:'Work Done',changedParts:'Changed Parts',addChangedPart:'Add Changed Part',changedPartNamePrompt:'Name of changed part',changedPartNotePrompt:'Part note (optional)',changedPartBy:'Worker',removeChangedPartConfirm:'Remove this part from the work record?',labor:'Labor (D)',discount:'Discount (D)',paid:'Paid (D)',balance:'Balance',open:'In Garage',ready:'Ready',delivered:'Delivered',save:'Save',addPart:'Add Part / Service to Invoice',invoiceItems:'Invoice Items',viewInvoice:'View Invoice',whatsapp:'WhatsApp',back:'Back',exitVehicle:'Vehicle Exit',whatsappWorker:'Mechanic WhatsApp',faultReports:'Fault Reports',faultCode:'Fault Code',faultNote:'Fault Description',faultPhoto:'Fault Photo',addFault:'Save Fault Report',laborSplit:'Labor Split',splitAmount:'Mechanic Share (D)',addSplit:'Add Share',partsRequests:'Parts Requests',workerPageHelp:'Only vehicles assigned to you appear here. You can start work, send a fault report with photo, request parts, or mark the work finished.',startWork:'Start Work',requestParts:'Parts Needed',finishWork:'Finished Work',reportFault:'Fault Report',period:'Period',todayPeriod:'Today',weekPeriod:'This Week',monthPeriod:'This Month',customPeriod:'Custom Dates',fromDate:'From',toDate:'To',refresh:'Refresh',garageLaborTotal:'Garage Labor Total',garageInvoiceTotal:'Invoice Total',workerProduction:'Mechanic Production',laborOnlyNote:'Mechanic production uses labor only. If labor is split among mechanics, each mechanic receives their assigned share.',invoiceCount:'Vehicle Count',paidTotal:'Paid',balanceTotal:'Balance',invoice:'Invoice',description:'Description',price:'Price',subtotal:'Subtotal',thanks:'Thank you for choosing Hassan Garage.',print:'Print / PDF',edit:'Open',delete:'Delete',parkingFee:'Entry Fee',laborFee:'Labor',discountLabel:'Discount',grandTotal:'Grand Total',noData:'No data yet',
+  pending:'Pending',approved:'Approved',rejected:'Rejected',arrived:'Arrived',details:'Details',accept:'Accept',reject:'Reject',markArrived:'Vehicle Arrived',noRequests:'No requests',validUntil:'Valid until',oneUse:'One use',created:'Created',source:'Source',requestCode:'Request Code',decision:'Decision',
+  adminRole:'Admin',employeeRole:'Employee',mechanicRole:'Mechanic',customerRole:'Customer',approval:'Approval Permission',active:'Active',disabled:'Disabled',enable:'Enable',disable:'Disable',enteredBy:'Entered by',
+  invalidLogin:'Incorrect username or password',enterCustomerOrPlate:'Enter the customer name or plate number',enterNameOrPlate:'Enter the name or plate number',codeNotFound:'Code not found',codeUsed:'This code has already been used',codeExpired:'This code has expired',requestSent:'Request submitted. The vehicle has not been accepted yet; please wait for garage approval.',noApprovalPermission:'You do not have permission to accept or reject vehicles',
+  partOrServicePrompt:'Part or service name',quantityPrompt:'Quantity',pricePrompt:'Price in dalasi',deletePartConfirm:'Delete this part?',enterEmployeeFields:'Enter the name, username and password',usernameUsed:'This username is already in use',backupRestored:'Backup restored',invalidFile:'Invalid file',
+  hello:'Hello',invoiceMessage:'Hassan Garage Invoice',carLabel:'Vehicle',totalLabel:'Total',fromBooking:'From booking',
+  LOGIN:'Login',LOGOUT:'Logout',BOOKING_CREATED:'Vehicle request created',CUSTOMER_CODE_CREATED:'Customer code created',CUSTOMER_CODE_USED:'Customer code used',BOOKING_APPROVED:'Vehicle request approved',BOOKING_REJECTED:'Vehicle request rejected',VEHICLE_ARRIVED:'Vehicle arrived',DIRECT_INTAKE:'Direct vehicle intake',JOB_UPDATED:'Vehicle record updated',WORKER_ASSIGNED:'Vehicle assigned to worker',CHANGED_PART_ADDED:'Changed part added',CHANGED_PART_REMOVED:'Changed part removed',INVOICE_LINE_ADDED:'Invoice line added',INVOICE_LINE_REMOVED:'Invoice line removed',STOCK_ADDED:'Inventory item added',STOCK_DELETED:'Inventory item deleted',USER_CREATED:'Employee created',USER_ENABLED:'Employee enabled',USER_DISABLED:'Employee disabled',FAULT_ADDED:'Fault report added',PARTS_REQUESTED:'Parts requested',WORK_STARTED:'Work started',WORK_FINISHED:'Work finished',LABOR_SPLIT_ADDED:'Labor split added',VEHICLE_EXITED:'Vehicle exited',BACKUP_RESTORED:'Backup restored',noActivity:'No activity yet'
+ }
+};
+const tr=k=>t[lang][k]||k;
+function persist(){localStorage.setItem(KEY,JSON.stringify(data));renderAll();}
+function log(action,detail=''){data.audit.unshift({id:Date.now()+Math.random(),time:nowIso(),user:currentUser?.username||'customer',name:currentUser?.name||tr('customerRole'),action,detail});data.audit=data.audit.slice(0,500);}
+function fmtDateTime(iso){if(!iso)return'';try{return new Date(iso).toLocaleString(lang==='ar'?'ar-EG':'en-GB')}catch{return iso}}
+function applyLang(){
+ document.documentElement.lang=lang;
+ document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+ document.body.dir=lang==='ar'?'rtl':'ltr';
+ document.querySelectorAll('[data-i18n]').forEach(e=>e.textContent=tr(e.dataset.i18n));
+ document.querySelectorAll('[data-i18n-placeholder]').forEach(e=>e.placeholder=tr(e.dataset.i18nPlaceholder));
+ ['authArBtn','langArBtn'].forEach(id=>{const e=$(id);if(e){e.classList.toggle('active-lang',lang==='ar');e.setAttribute('aria-pressed',lang==='ar'?'true':'false')}});
+ ['authEnBtn','langEnBtn'].forEach(id=>{const e=$(id);if(e){e.classList.toggle('active-lang',lang==='en');e.setAttribute('aria-pressed',lang==='en'?'true':'false')}});
+ localStorage.setItem('hassanLang',lang);
+ if(currentUser) updateUserChip();
+ renderAll();
+ const active=document.querySelector('.panel.active')?.id;
+ if(currentUser&&currentId&&active==='editor'){const j=data.jobs.find(x=>x.id===currentId);if(j)openEditor(j.id,lastListTab)}
+ if(currentUser&&currentId&&active==='invoicePanel')showInvoice();
+}
+function setLanguage(newLang){lang=newLang==='en'?'en':'ar';applyLang()}
+window.setLanguage=setLanguage;
+function toggleLang(){setLanguage(lang==='ar'?'en':'ar');}
+function isAdmin(){return currentUser?.role==='admin'}
+function canOpenTab(id){if(isAdmin())return true;if(currentUser?.role==='mechanic')return id==='worker';if(currentUser?.role==='seller')return id==='sales'||id==='salesDone';return id==='intake'}
+function switchTab(id){if(currentUser&&!canOpenTab(id))id='intake';document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));$(id)?.classList.add('active');document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));window.scrollTo({top:0,behavior:'smooth'})}
+function setMode(customer){$('staffLogin').classList.toggle('hidden',customer);$('customerLogin').classList.toggle('hidden',!customer);$('staffModeBtn').className='btn '+(!customer?'primary':'secondary');$('customerModeBtn').className='btn '+(customer?'primary':'secondary')}
+$('staffModeBtn').onclick=()=>setMode(false);$('customerModeBtn').onclick=()=>setMode(true);
+$('cDate').value=today();$('bDate').value=today();$('dateIn').value=today();$('timeIn').value=timeNow();if($('reportFrom')){$('reportFrom').value=today().slice(0,8)+'01';$('reportTo').value=today();}
+const REMEMBER_KEY='hassanGarageRememberedLogin';
+function loadRememberedLogin(){try{if(sessionStorage.getItem('hgSuppressRememberOnce')==='1'){sessionStorage.removeItem('hgSuppressRememberOnce');$('loginUser').value='';$('loginPass').value='';$('rememberLogin').checked=false;return}const saved=JSON.parse(localStorage.getItem(REMEMBER_KEY)||'null');if(saved&&saved.username&&saved.password){$('loginUser').value=saved.username;$('loginPass').value=saved.password;$('rememberLogin').checked=true}}catch{localStorage.removeItem(REMEMBER_KEY)}}
+function saveRememberedLogin(username,password){if($('rememberLogin')?.checked){localStorage.setItem(REMEMBER_KEY,JSON.stringify({username,password}))}else{localStorage.removeItem(REMEMBER_KEY)}}
+function login(){const u=$('loginUser').value.trim().toLowerCase(),p=$('loginPass').value;const found=data.users.find(x=>x.active!==false&&x.username.toLowerCase()===u&&x.password===p);if(!found){alert(tr('invalidLogin'));return}saveRememberedLogin(u,p);currentUser=found;sessionStorage.setItem('hgUser',found.id);showApp();log('LOGIN');persist()}
+$('loginBtn').onclick=login;$('loginPass').onkeydown=e=>{if(e.key==='Enter')login()};$('rememberLogin').onchange=()=>{if(!$('rememberLogin').checked)localStorage.removeItem(REMEMBER_KEY)};loadRememberedLogin();
+function roleLabel(role){return role==='admin'?tr('adminRole'):role==='employee'?tr('employeeRole'):role==='mechanic'?tr('mechanicRole'):role==='seller'?tr('sellerRole'):tr('customerRole')}
+function updateUserChip(){if(currentUser&&$('userChip'))$('userChip').textContent=`${currentUser.name} · ${roleLabel(currentUser.role)}`}
+function showApp(){
+  if(!currentUser)return;
+  const auth=$('authScreen'),app=$('appShell');
+  auth.classList.add('hidden');auth.style.removeProperty('display');
+  app.classList.remove('hidden');app.style.removeProperty('display');app.removeAttribute('aria-hidden');
+  updateUserChip();
+  const admin=isAdmin();
+
+  document.querySelectorAll('.tab').forEach(e=>{
+    const tab=e.dataset.tab;
+    if(admin){
+      e.classList.remove('hidden');
+      if(e.classList.contains('mechanic-only'))e.classList.add('hidden');
+    }else if(currentUser.role==='mechanic'){
+      e.classList.toggle('hidden',tab!=='worker');
+    }else if(currentUser.role==='seller'){
+      e.classList.toggle('hidden',tab!=='sales');
+    }else{
+      e.classList.toggle('hidden',tab!=='intake');
+    }
+  });
+
+  document.querySelectorAll('.admin-only').forEach(e=>e.classList.toggle('hidden',!admin));
+  document.querySelectorAll('.mechanic-only').forEach(e=>e.classList.toggle('hidden',currentUser?.role!=='mechanic'));
+  if($('parkingFeeWrap'))$('parkingFeeWrap').classList.toggle('hidden',!admin);
+
+  switchTab(admin?'dashboard':currentUser.role==='mechanic'?'worker':currentUser.role==='seller'?'sales':'intake');
+  renderAll();
+}
+function hardLogout(ev){
+ if(ev){ev.preventDefault();ev.stopPropagation();}
+ try{log('LOGOUT');localStorage.setItem(KEY,JSON.stringify(data));}catch(e){}
+ try{sessionStorage.removeItem('hgUser')}catch(e){}
+ currentUser=null;currentId=null;activeCustomerCode=null;lastListTab='jobs';
+ const app=$('appShell'),auth=$('authScreen');
+ if(app){app.classList.add('hidden');app.style.setProperty('display','none','important');app.setAttribute('aria-hidden','true');}
+ if(auth){auth.classList.remove('hidden');auth.style.setProperty('display','grid','important');auth.removeAttribute('aria-hidden');}
+ document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+ if($('dashboard'))$('dashboard').classList.add('active');
+ document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab==='dashboard'));
+ if($('loginUser'))$('loginUser').value='';
+ if($('loginPass'))$('loginPass').value='';
+ if($('rememberLogin'))$('rememberLogin').checked=false;
+ setMode(false);
+ if($('customerForm'))$('customerForm').classList.add('hidden');
+ if($('customerCodeInput'))$('customerCodeInput').value='';
+ if($('userChip'))$('userChip').textContent='';
+ document.documentElement.lang=lang;
+ document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+ document.body.dir=lang==='ar'?'rtl':'ltr';
+ document.querySelectorAll('[data-i18n]').forEach(e=>e.textContent=tr(e.dataset.i18n));
+ document.querySelectorAll('[data-i18n-placeholder]').forEach(e=>e.placeholder=tr(e.dataset.i18nPlaceholder));
+ window.scrollTo(0,0);
+ try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+ setTimeout(()=>{try{$('loginUser').focus()}catch(e){}},30);
+ return false;
+}
+window.hardLogout=hardLogout;
+const oldSession=sessionStorage.getItem('hgUser');if(oldSession){const u=data.users.find(x=>x.id===oldSession&&x.active!==false);if(u){currentUser=u;showApp()}}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+function hasApprove(){return isAdmin()}
+function createBooking(obj,source='staff'){const b={id:Date.now()+Math.random(),customer:obj.customer||'',phone:obj.phone||'',plate:obj.plate||'',car:obj.car||'',complaint:obj.complaint||'',date:obj.date||'',time:obj.time||'',status:'pending',source,code:obj.code||'',createdAt:nowIso(),createdBy:source==='customer'?'customer':currentUser.username,createdByName:source==='customer'?'Customer':currentUser.name,jobId:null};data.bookings.unshift(b);log('BOOKING_CREATED',`${b.customer} ${b.plate}`);return b}
+$('createBookingBtn').onclick=()=>{if(!isAdmin())return;const obj={customer:$('bCustomer').value.trim(),phone:$('bPhone').value.trim(),plate:$('bPlate').value.trim(),car:$('bCar').value.trim(),complaint:$('bComplaint').value.trim(),date:$('bDate').value,time:$('bTime').value};if(!obj.customer&&!obj.plate){alert(tr('enterCustomerOrPlate'));return}createBooking(obj);persist();['bCustomer','bPhone','bPlate','bCar','bComplaint','bTime'].forEach(id=>$(id).value='');$('bDate').value=today()};
+function codeString(){return 'HG-'+Math.floor(100000+Math.random()*900000)}
+$('generateCodeBtn').onclick=()=>{if(!isAdmin())return;let code;do{code=codeString()}while(data.codes.some(c=>c.code===code));const hrs=Math.max(1,Number($('codeHours').value||24));const c={id:Date.now()+Math.random(),code,note:$('codeNote').value.trim(),createdBy:currentUser.username,createdAt:nowIso(),expiresAt:new Date(Date.now()+hrs*3600000).toISOString(),used:false,usedAt:null};data.codes.unshift(c);log('CUSTOMER_CODE_CREATED',code);persist();$('newCodeBox').innerHTML=`<div class="codebox">${code}</div><div class="muted">${tr('validUntil')} ${fmtDateTime(c.expiresAt)} · ${tr('oneUse')}</div>`};
+$('openCustomerForm').onclick=()=>{const code=$('customerCodeInput').value.trim().toUpperCase();const c=data.codes.find(x=>x.code.toUpperCase()===code);if(!c){alert(tr('codeNotFound'));return}if(c.used){alert(tr('codeUsed'));return}if(new Date(c.expiresAt)<new Date()){alert(tr('codeExpired'));return}activeCustomerCode=c;$('customerForm').classList.remove('hidden')};
+$('submitCustomerBooking').onclick=()=>{if(!activeCustomerCode)return;const obj={customer:$('cName').value.trim(),phone:$('cPhone').value.trim(),plate:$('cPlate').value.trim(),car:$('cCar').value.trim(),complaint:$('cComplaint').value.trim(),date:$('cDate').value,time:$('cTime').value,code:activeCustomerCode.code};if(!obj.customer&&!obj.plate){alert(tr('enterNameOrPlate'));return}createBooking(obj,'customer');activeCustomerCode.used=true;activeCustomerCode.usedAt=nowIso();log('CUSTOMER_CODE_USED',activeCustomerCode.code);persist();alert(tr('requestSent'));['cName','cPhone','cPlate','cCar','cComplaint','cTime','customerCodeInput'].forEach(id=>$(id).value='');$('customerForm').classList.add('hidden');activeCustomerCode=null};
+function bookingActions(b){let a=`<button class="btn secondary small" onclick="showBooking(${b.id})">${tr('details')}</button>`;if(b.status==='pending'&&hasApprove())a+=` <button class="btn success small" onclick="setBookingStatus(${b.id},'approved')">${tr('accept')}</button> <button class="btn danger small" onclick="setBookingStatus(${b.id},'rejected')">${tr('reject')}</button>`;if(b.status==='approved')a+=` <button class="btn primary small" onclick="markArrived(${b.id})">${tr('markArrived')}</button>`;return a}
+function renderBookings(){const q=($('bookingSearch')?.value||'').toLowerCase();const arr=data.bookings.filter(b=>[b.customer,b.phone,b.plate,b.car,b.code].join(' ').toLowerCase().includes(q));$('bookingBody').innerHTML=arr.map(b=>`<tr><td>${esc([b.date,b.time].filter(Boolean).join(' '))}</td><td><b>${esc(b.customer)}</b><div class="muted">${esc(b.phone)}</div></td><td>${esc(b.car)}<div class="muted">${esc(b.plate)}</div></td><td><span class="pill ${b.status}">${tr(b.status)}</span></td><td>${esc(b.createdByName==='Customer'?tr('customerRole'):(b.createdByName||b.createdBy))}</td><td>${bookingActions(b)}</td></tr>`).join('')||`<tr><td colspan="6">${tr('noRequests')}</td></tr>`}
+$('bookingSearch').oninput=renderBookings;
+window.showBooking=id=>{if(!isAdmin())return;const b=data.bookings.find(x=>x.id===id);if(!b)return;const parts=[`${tr('customerShort')}: ${b.customer}`,`${tr('phoneOnly')}: ${b.phone}`,`${tr('plate')}: ${b.plate}`,`${tr('car')}: ${b.car}`,`${tr('appointment')}: ${[b.date,b.time].filter(Boolean).join(' ')}`,`${tr('status')}: ${tr(b.status)}`,`${tr('problemRequest')}: ${b.complaint||'-'}`,`${tr('createdBy')}: ${b.createdByName==='Customer'?tr('customerRole'):(b.createdByName||b.createdBy)}`,b.code?`${tr('requestCode')}: ${b.code}`:''].filter(Boolean);alert(parts.join('\n'))};
+window.setBookingStatus=(id,status)=>{if(!hasApprove()){alert(tr('noApprovalPermission'));return}const b=data.bookings.find(x=>x.id===id);if(!b||b.status!=='pending')return;b.status=status;b.decidedAt=nowIso();b.decidedBy=currentUser.username;log(status==='approved'?'BOOKING_APPROVED':'BOOKING_REJECTED',`${b.customer} ${b.plate}`);persist()};
+window.markArrived=id=>{if(!isAdmin())return;const b=data.bookings.find(x=>x.id===id);if(!b||b.status!=='approved')return;const parts=(b.car||'').trim().split(/\s+/);const j={id:Date.now(),customer:b.customer,phone:b.phone,plate:b.plate,make:parts.shift()||'',model:parts.join(' '),year:'',color:'',vin:'',complaint:b.complaint,entryNotes:`${tr('fromBooking')} #${Math.floor(b.id)}${b.code?' / '+b.code:''}`,parkingFee:100,dateIn:today(),timeIn:timeNow(),dateOut:'',timeOut:'',status:'open',workDone:'',assignedWorkerId:'',assignedWorkerName:'',changedParts:[],faultReports:[],laborSplits:[],partsRequests:[],labor:0,discount:0,paid:0,lines:[],createdBy:currentUser.username,bookingId:b.id};data.jobs.unshift(j);b.status='arrived';b.jobId=j.id;b.arrivedAt=nowIso();log('VEHICLE_ARRIVED',`${b.customer} ${b.plate}`);persist();openEditor(j.id)};
+function jobTotal(j){return (j.lines||[]).reduce((s,l)=>s+Number(l.qty||0)*Number(l.price||0),0)+Number(j.labor||0)+Number(j.parkingFee||0)-Number(j.discount||0)}
+let intakeSaving=false;
+let lastIntakeFingerprint='';
+let lastIntakeSavedAt=0;
+
+function clearIntakeFormAfterSave(){
+  ['customer','phone','plate','make','model','year','color','vin','complaint','entryNotes'].forEach(id=>{
+    const el=$(id); if(el){el.value='';el.classList.remove('required-error');}
+  });
+  if($('intakeWorker'))$('intakeWorker').value='';
+  if($('parkingFee'))$('parkingFee').value='';
+  if($('dateIn'))$('dateIn').value='';
+  if($('timeIn'))$('timeIn').value='';
+}
+
+function showHgToast(msg){
+  const old=document.getElementById('hgToast'); if(old)old.remove();
+  const d=document.createElement('div'); d.id='hgToast'; d.className='hg-toast'; d.textContent=msg;
+  document.body.appendChild(d); setTimeout(()=>d.remove(),1800);
+}
+
+function saveGarageDataSafe(){
+  try{
+    localStorage.setItem(KEY,JSON.stringify(data));
+    return true;
+  }catch(e){
+    console.error('Garage save error',e);
+    return false;
+  }
+}
+
+$('saveIntake').onclick=()=>{
+  if(intakeSaving)return;
+
+  const saveBtn=$('saveIntake');
+  const phone=$('phone').value.trim();
+  const plate=$('plate').value.trim();
+  const vin=$('vin').value.trim();
+
+  $('phone').classList.remove('required-error');
+  $('plate').classList.remove('required-error');
+
+  if(!plate){
+    $('plate').classList.add('required-error');
+    $('plate').focus();
+    alert(lang==='ar'?'لا يمكن إدخال السيارة بدون رقم اللوحة.':'Plate number is required before vehicle entry.');
+    return;
+  }
+  if(!phone){
+    $('phone').classList.add('required-error');
+    $('phone').focus();
+    alert(lang==='ar'?'لا يمكن إدخال السيارة بدون رقم الهاتف.':'Phone number is required before vehicle entry.');
+    return;
+  }
+
+  const fingerprint=[plate.toLowerCase(),phone.replace(/\D/g,''),vin.toLowerCase()].join('|');
+  const now=Date.now();
+  if(fingerprint===lastIntakeFingerprint && (now-lastIntakeSavedAt)<5000){
+    switchTab('inside');
+    renderInsideCars();
+    showHgToast(lang==='ar'?'السيارة محفوظة بالفعل ✓':'Vehicle already saved ✓');
+    return;
+  }
+
+  const workerId=$('intakeWorker')?.value||'';
+  const worker=data.users.find(u=>u.id===workerId);
+
+  const j={
+    id:Date.now()+Math.random(),
+    customer:$('customer').value.trim(),
+    phone,
+    plate,
+    make:$('make').value.trim(),
+    model:$('model').value.trim(),
+    year:$('year').value.trim(),
+    color:$('color').value.trim(),
+    vin,
+    complaint:$('complaint').value.trim(),
+    entryNotes:$('entryNotes').value.trim(),
+    parkingFee:Number($('parkingFee').value||100),
+    dateIn:$('dateIn').value||today(),
+    timeIn:$('timeIn').value||timeNow(),
+    dateOut:'',
+    timeOut:'',
+    status:'open',
+    workDone:'',
+    assignedWorkerId:workerId,
+    assignedWorkerName:worker?.name||'',
+    changedParts:[],
+    faultReports:[],
+    laborSplits:[],
+    partsRequests:[],
+    labor:0,
+    discount:0,
+    paid:0,
+    lines:[],
+    createdBy:currentUser.username
+  };
+
+  intakeSaving=true;
+  if(saveBtn)saveBtn.disabled=true;
+
+  data.jobs.unshift(j);
+  lastIntakeFingerprint=fingerprint;
+  lastIntakeSavedAt=Date.now();
+
+  log('DIRECT_INTAKE',`${j.customer} ${j.plate}`);
+  if(workerId)log('WORKER_ASSIGNED',`${j.customer} ${j.plate} · ${j.assignedWorkerName}`);
+
+  clearIntakeFormAfterSave();
+
+  renderInsideCars();
+  switchTab('inside');
+  renderInsideCars();
+  renderDashboard();
+
+  const savedOk=saveGarageDataSafe();
+  showHgToast(
+    savedOk
+      ? (lang==='ar'?'تم دخول السيارة ✓':'Vehicle entered ✓')
+      : (lang==='ar'?'تم إدخال السيارة، لكن المتصفح لم يحفظ النسخة الدائمة':'Vehicle entered, but browser storage could not save permanently')
+  );
+
+  if(worker?.phone){
+    setTimeout(()=>{
+      if(confirm(lang==='ar'?'إرسال واتساب للشغيل الآن؟':'Send WhatsApp to the mechanic now?')) sendWorkerWhatsApp(j,worker);
+    },250);
+  }
+
+  setTimeout(()=>{
+    intakeSaving=false;
+    if(saveBtn){saveBtn.disabled=false;saveBtn.textContent=tr('saveVehicle');}
+  },350);
+};
+const expandedJobDays=new Set();
+const expandedArchiveDays=new Set();
+function displayDay(d){if(!d||d==='-')return d||'-';const p=d.split('-');return p.length===3?`${p[2]}-${p[1]}-${p[0]}`:d}
+window.toggleInvoiceDay=(scope,d)=>{const set=scope==='archive'?expandedArchiveDays:expandedJobDays;if(set.has(d))set.delete(d);else set.add(d);scope==='archive'?renderArchive():renderJobs()};
+function renderJobs(){if(!isAdmin()){if($('jobsBody'))$('jobsBody').innerHTML='';return}const q=($('jobSearch')?.value||'').toLowerCase();const arr=data.jobs.filter(j=>[j.customer,j.phone,j.plate,j.make,j.model,j.year,j.color,j.vin,j.assignedWorkerName].join(' ').toLowerCase().includes(q)).sort((a,b)=>((b.dateIn||'')+' '+(b.timeIn||'')).localeCompare((a.dateIn||'')+' '+(a.timeIn||'')));if(!arr.length){$('jobsBody').innerHTML=`<tr><td colspan="8">${tr('noData')}</td></tr>`;return}const groups={};arr.forEach(j=>{const d=j.dateIn||'-';(groups[d]||(groups[d]=[])).push(j)});$('jobsBody').innerHTML=Object.entries(groups).map(([d,items])=>{const open=expandedJobDays.has(d);const countLabel=lang==='ar'?`${items.length} فاتورة`:`${items.length} invoice${items.length===1?'':'s'}`;const dayTotal=items.reduce((sum,j)=>sum+jobTotal(j),0);const icon=open?'−':'＋';return `<tr class="day-separator day-toggle" onclick="toggleInvoiceDay('jobs','${esc(d)}')"><td colspan="8"><div class="day-folder"><div><div><span class="day-folder-title">📅 ${esc(displayDay(d))}</span><span class="day-meta">${countLabel}</span></div><span class="day-total"><span class="day-total-label">${tr('dailyWorkTotal')}:</span> ${money(dayTotal)}</span></div><span class="day-folder-icon">${icon}</span></div></td></tr>`+items.map(j=>`<tr class="click-row" style="${open?'':'display:none'}" onclick="openEditor(${j.id},'jobs')"><td>${esc(j.timeIn||'')}</td><td>${j.status!=='delivered'?'<span class="garage-dot"></span>':''}<span class="click-name">${esc(j.customer)}</span><div class="click-hint">${tr('tapToOpen')}</div></td><td>${esc([j.make,j.model,j.year].filter(Boolean).join(' '))}<div class="muted">${esc(j.color||'')}${j.vin?' · VIN: '+esc(j.vin):''}</div></td><td>${esc(j.plate)}</td><td>${esc(j.assignedWorkerName||tr('unassignedWorker'))}</td><td><span class="pill">${tr(j.status)}</span></td><td>${money(jobTotal(j))}</td><td><button class="btn secondary" onclick="event.stopPropagation();openEditor(${j.id},'jobs')">${tr('edit')}</button></td></tr>`).join('')}).join('')}
+function archiveYears(){return [...new Set(data.jobs.map(j=>(j.dateIn||'').slice(0,4)).filter(Boolean))].sort((a,b)=>b.localeCompare(a))}
+function setupArchiveFilters(){if(!$('archiveYear'))return;const prevY=$('archiveYear').value,prevM=$('archiveMonth').value;const years=archiveYears();$('archiveYear').innerHTML=`<option value="">${tr('allYears')}</option>`+years.map(y=>`<option value="${y}">${y}</option>`).join('');if(years.includes(prevY))$('archiveYear').value=prevY;$('archiveMonth').innerHTML=`<option value="">${tr('allMonths')}</option>`+Array.from({length:12},(_,i)=>`<option value="${String(i+1).padStart(2,'0')}">${monthName(i+1)}</option>`).join('');$('archiveMonth').value=prevM||''}
+function renderArchive(){if(!isAdmin()||!$('archiveBody'))return;setupArchiveFilters();const y=$('archiveYear').value,m=$('archiveMonth').value,q=($('archiveSearch').value||'').toLowerCase();const arr=data.jobs.filter(j=>{const d=j.dateIn||'';const yy=!y||d.startsWith(y);const mm=!m||d.slice(5,7)===m;const text=[j.customer,j.phone,j.plate,j.make,j.model,j.year,j.color,j.vin,j.assignedWorkerName,j.workDone,(j.changedParts||[]).map(p=>p.name).join(' '),(j.lines||[]).map(l=>l.desc).join(' ')].join(' ').toLowerCase();return yy&&mm&&text.includes(q)}).sort((a,b)=>((b.dateIn||'')+' '+(b.timeIn||'')).localeCompare((a.dateIn||'')+' '+(a.timeIn||'')));if(!arr.length){$('archiveBody').innerHTML=`<tr><td colspan="9">${tr('noData')}</td></tr>`}else{const groups={};arr.forEach(j=>{const d=j.dateIn||'-';(groups[d]||(groups[d]=[])).push(j)});$('archiveBody').innerHTML=Object.entries(groups).map(([d,items])=>{const open=expandedArchiveDays.has(d);const countLabel=lang==='ar'?`${items.length} فاتورة`:`${items.length} invoice${items.length===1?'':'s'}`;const dayTotal=items.reduce((sum,j)=>sum+jobTotal(j),0);const icon=open?'−':'＋';return `<tr class="day-separator day-toggle" onclick="toggleInvoiceDay('archive','${esc(d)}')"><td colspan="9"><div class="day-folder"><div><div><span class="day-folder-title">📅 ${esc(displayDay(d))}</span><span class="day-meta">${countLabel}</span></div><span class="day-total"><span class="day-total-label">${tr('dailyWorkTotal')}:</span> ${money(dayTotal)}</span></div><span class="day-folder-icon">${icon}</span></div></td></tr>`+items.map(j=>`<tr class="click-row" style="${open?'':'display:none'}" onclick="openEditor(${j.id},'archive')"><td>${esc(j.timeIn||'')}</td><td>${esc(j.dateOut||'-')} ${esc(j.timeOut||'')}</td><td><span class="click-name">${esc(j.customer)}</span><div class="muted">${esc(j.phone)}</div><div class="click-hint">${tr('tapToOpen')}</div></td><td>${esc([j.make,j.model,j.year].filter(Boolean).join(' '))}<div class="muted">${esc(j.color||'')}</div></td><td>${esc(j.plate)}</td><td>${esc(j.vin||'-')}</td><td><span class="pill">${tr(j.status)}</span></td><td>${money(jobTotal(j))}</td><td><button class="btn secondary" onclick="event.stopPropagation();openEditor(${j.id},'archive')">${tr('openFile')}</button></td></tr>`).join('')}).join('')}const summaryYear=y||String(new Date().getFullYear());$('monthSummary').innerHTML=Array.from({length:12},(_,i)=>{const mm=String(i+1).padStart(2,'0');const count=data.jobs.filter(j=>(j.dateIn||'').startsWith(summaryYear+'-'+mm)).length;return `<button class="btn ${m===mm?'primary':'secondary'}" onclick="setArchiveMonth('${mm}')">${monthName(i+1)} · ${count}</button>`}).join('')}
+window.setArchiveMonth=m=>{if(!$('archiveYear').value)$('archiveYear').value=String(new Date().getFullYear());$('archiveMonth').value=m;renderArchive()};
+if($('archiveSearch'))$('archiveSearch').oninput=renderArchive;if($('archiveYear'))$('archiveYear').onchange=renderArchive;if($('archiveMonth'))$('archiveMonth').onchange=renderArchive;
+window.openEditor=(id,source='jobs')=>{if(!isAdmin())return;lastListTab=source==='archive'?'archive':source==='inside'?'inside':source==='exited'?'exited':'jobs';currentId=id;const j=data.jobs.find(x=>x.id===id);if(!j)return;if(!Array.isArray(j.changedParts))j.changedParts=[];$('editorInfo').innerHTML=`<b>${esc(j.customer)}</b><div class="muted">${esc(j.phone)} · ${esc(j.plate)}</div><div>${esc([j.make,j.model,j.year].filter(Boolean).join(' '))}</div><div class="notice" style="margin-top:10px">${esc(j.complaint||'')}</div><div class="muted">${tr('enteredBy')}: ${esc(j.createdBy||'')}</div>`;$('editColor').value=j.color||'';$('editVin').value=j.vin||'';$('editDateIn').value=j.dateIn||'';$('editTimeIn').value=j.timeIn||'';$('dateOut').value=j.dateOut||'';$('timeOut').value=j.timeOut||'';renderWorkerOptions(j);$('workDone').value=j.workDone||'';$('labor').value=j.labor||0;$('discount').value=j.discount||0;$('paid').value=j.paid||0;$('status').value=j.status||'open';renderChangedParts(j);renderFaultReports(j);renderLaborSplits(j);renderPartsRequests(j);renderLines(j);switchTab('editor')};
+$('saveJob').onclick=()=>{if(!isAdmin())return;const j=data.jobs.find(x=>x.id===currentId);if(!j)return;const prevWorker=j.assignedWorkerId||'';const workerId=$('assignedWorker').value;const worker=data.users.find(u=>u.id===workerId);j.assignedWorkerId=workerId;j.assignedWorkerName=worker?.name||'';j.color=$('editColor').value.trim();j.vin=$('editVin').value.trim();j.dateIn=$('editDateIn').value||j.dateIn;j.timeIn=$('editTimeIn').value||j.timeIn;j.dateOut=$('dateOut').value||j.dateOut||'';j.timeOut=$('timeOut').value||j.timeOut||'';j.workDone=$('workDone').value;j.labor=Number($('labor').value||0);j.discount=Number($('discount').value||0);j.paid=Number($('paid').value||0);j.status=$('status').value;if(j.status==='delivered'&&!j.dateOut){j.dateOut=today();j.timeOut=timeNow()}if(j.status==='delivered'&&j.dateOut&&!j.timeOut)j.timeOut=timeNow();if(prevWorker!==workerId)log('WORKER_ASSIGNED',`${j.customer} ${j.plate} · ${j.assignedWorkerName||tr('unassignedWorker')}`);log('JOB_UPDATED',`${j.customer} ${j.plate}`);persist();openEditor(j.id,lastListTab)};
+function renderWorkerOptions(j){const workers=data.users.filter(u=>(u.role==='mechanic'||u.role==='employee')&&u.active!==false);const currentExists=j.assignedWorkerId&&data.users.some(u=>u.id===j.assignedWorkerId);let html=`<option value="">${tr('unassignedWorker')}</option>`;if(currentExists&&!workers.some(u=>u.id===j.assignedWorkerId)){const u=data.users.find(u=>u.id===j.assignedWorkerId);html+=`<option value="${esc(u.id)}">${esc(u.name)} (${tr('disabled')})</option>`}html+=workers.map(u=>`<option value="${esc(u.id)}">${esc(u.name)}</option>`).join('');$('assignedWorker').innerHTML=html;$('assignedWorker').value=j.assignedWorkerId||''}
+function renderChangedParts(j){const parts=j.changedParts||[];$('changedPartsList').innerHTML=parts.map(p=>`<div style="display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #eee;padding:9px 0"><div><b>${esc(p.name)}</b><div class="muted">${tr('qty')}: ${Number(p.qty||1)}${p.note?' · '+esc(p.note):''}</div><div class="muted">${tr('changedPartBy')}: ${esc(p.workerName||j.assignedWorkerName||tr('unassignedWorker'))}${p.time?' · '+fmtDateTime(p.time):''}</div></div><button class="btn danger small" onclick="removeChangedPart(${p.id})">${tr('delete')}</button></div>`).join('')||`<div class="muted">${tr('noData')}</div>`}
+$('addChangedPartBtn').onclick=()=>{if(!isAdmin())return;const j=data.jobs.find(x=>x.id===currentId);if(!j)return;const name=prompt(tr('changedPartNamePrompt'));if(!name)return;const qty=Math.max(1,Number(prompt(tr('quantityPrompt'),'1')||1));const note=prompt(tr('changedPartNotePrompt'),'')||'';const workerId=$('assignedWorker').value||j.assignedWorkerId||'';const worker=data.users.find(u=>u.id===workerId);j.assignedWorkerId=workerId;j.assignedWorkerName=worker?.name||j.assignedWorkerName||'';if(!Array.isArray(j.changedParts))j.changedParts=[];j.changedParts.push({id:Date.now()+Math.random(),name,qty,note,workerId:j.assignedWorkerId||'',workerName:j.assignedWorkerName||'',time:nowIso(),addedBy:currentUser.username});log('CHANGED_PART_ADDED',`${j.plate} · ${name}`);persist();openEditor(j.id)};
+window.removeChangedPart=id=>{if(!isAdmin())return;const j=data.jobs.find(x=>x.id===currentId);if(!j||!Array.isArray(j.changedParts))return;if(!confirm(tr('removeChangedPartConfirm')))return;const p=j.changedParts.find(x=>x.id===id);j.changedParts=j.changedParts.filter(x=>x.id!==id);log('CHANGED_PART_REMOVED',`${j.plate} · ${p?.name||''}`);persist();openEditor(j.id)};
+$('addLineBtn').onclick=()=>{if(!isAdmin())return;const j=data.jobs.find(x=>x.id===currentId);if(!j)return;const desc=prompt(tr('partOrServicePrompt'));if(!desc)return;const qty=Number(prompt(tr('quantityPrompt'),'1')||1);const price=Number(prompt(tr('pricePrompt'),'0')||0);j.lines.push({id:Date.now(),desc,qty,price});log('INVOICE_LINE_ADDED',desc);persist();openEditor(j.id)};
+function renderLines(j){$('linesList').innerHTML=(j.lines||[]).map(l=>`<div style="display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #eee;padding:9px 0"><div><b>${esc(l.desc)}</b><div class="muted">${l.qty} × ${money(l.price)}</div></div><div><b>${money(l.qty*l.price)}</b> <button class="btn danger small" onclick="removeLine(${l.id})">×</button></div></div>`).join('')||`<div class="muted">${tr('noData')}</div>`}
+window.removeLine=id=>{if(!isAdmin())return;const j=data.jobs.find(x=>x.id===currentId);j.lines=j.lines.filter(l=>l.id!==id);log('INVOICE_LINE_REMOVED');persist();openEditor(j.id)};
+$('backJobs').onclick=()=>switchTab(lastListTab);$('showInvoice').onclick=showInvoice;$('closeInvoice').onclick=()=>openEditor(currentId);
+function showInvoice(){if(!isAdmin())return;const j=data.jobs.find(x=>x.id===currentId);if(!j)return;$('invMeta').innerHTML=`<b>#${j.id}</b><br>${tr('dateIn')}: ${esc(j.dateIn||'')} ${esc(j.timeIn||'')}${j.dateOut?`<br>${tr('dateOut')}: ${esc(j.dateOut)} ${esc(j.timeOut||'')}`:''}`;$('invCustomer').innerHTML=`<b>${tr('customer')}:</b> ${esc(j.customer)}<br><b>${tr('phoneOnly')}:</b> ${esc(j.phone)}<br><b>${tr('car')}:</b> ${esc([j.make,j.model,j.year].filter(Boolean).join(' '))} · ${esc(j.plate)}<br><b>${tr('color')}:</b> ${esc(j.color||'-')}<br><b>${tr('vin')}:</b> ${esc(j.vin||'-')}`;$('invWork').innerHTML=`<b>${tr('assignedWorker')}:</b> ${esc(j.assignedWorkerName||tr('unassignedWorker'))}<br><b>${tr('workDone')}:</b> ${esc(j.workDone||'-')}${(j.changedParts||[]).length?`<br><b>${tr('changedParts')}:</b> ${(j.changedParts||[]).map(p=>esc(p.name)+' × '+Number(p.qty||1)).join('، ')}`:''}`;let rows=(j.lines||[]).map(l=>`<tr><td>${esc(l.desc)}</td><td>${l.qty}</td><td>${money(l.price)}</td><td>${money(l.qty*l.price)}</td></tr>`).join('');if(Number(j.parkingFee)>0)rows+=`<tr><td>${tr('parkingFee')}</td><td>1</td><td>${money(j.parkingFee)}</td><td>${money(j.parkingFee)}</td></tr>`;if(Number(j.labor)>0)rows+=`<tr><td>${tr('laborFee')}</td><td>1</td><td>${money(j.labor)}</td><td>${money(j.labor)}</td></tr>`;$('invLines').innerHTML=rows;const grand=jobTotal(j),paid=Number(j.paid||0),balance=Math.max(0,grand-paid);$('invTotals').innerHTML=`${Number(j.discount)>0?`<div>${tr('discountLabel')}: -${money(j.discount)}</div>`:''}<div class="total">${tr('grandTotal')}: ${money(grand)}</div><div>${tr('paid')}: ${money(paid)}</div><div><b>${tr('balance')}: ${money(balance)}</b></div>`;switchTab('invoicePanel')}
+$('whatsappBtn').onclick=()=>{if(!isAdmin())return;const j=data.jobs.find(x=>x.id===currentId);if(!j)return;const phone=(j.phone||'').replace(/\D/g,'');const msg=`${tr('hello')} ${j.customer||''}\n${tr('invoiceMessage')}\n${tr('carLabel')}: ${[j.make,j.model,j.year].filter(Boolean).join(' ')} ${j.plate||''}\n${tr('totalLabel')}: ${money(jobTotal(j))}`;window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank')};
+$('addStockBtn').onclick=()=>{
+  if(!isAdmin())return;
+
+  const name=$('stockName').value.trim();
+  const sku=$('stockSku').value.trim();
+  const qty=Math.max(1,Number($('stockQty').value||1));
+  const cost=Number($('stockCost').value||0);
+  const sell=Number($('stockSell').value||0);
+  const minQty=Number($('stockMin').value||0);
+
+  if(!name){
+    alert(lang==='ar'?'اكتب اسم القطعة أولاً':'Enter the item name first');
+    $('stockName').focus();
+    return;
+  }
+
+  const existing=sku
+    ? data.stock.find(x=>String(x.sku||'').trim().toLowerCase()===sku.toLowerCase())
+    : null;
+
+  let savedItem;
+
+  if(existing){
+    existing.qty=Number(existing.qty||0)+qty;
+    existing.cost=cost;
+    existing.sell=sell;
+    existing.minQty=minQty;
+    if(name)existing.name=name;
+    savedItem=existing;
+    log('STOCK_ADDED',`${existing.name} +${qty}`);
+  }else{
+    savedItem={
+      id:Date.now()+Math.random(),
+      name,sku,qty,cost,sell,minQty
+    };
+    data.stock.unshift(savedItem);
+    log('STOCK_ADDED',name);
+  }
+
+  persist();
+
+  // Clear the Add Inventory form completely.
+  ['stockName','stockSku'].forEach(id=>$(id).value='');
+  $('stockQty').value=1;
+  $('stockCost').value=0;
+  $('stockSell').value=0;
+  $('stockMin').value=2;
+
+  // Go directly to Stock / Sales and show the item just added in search.
+  if($('saleSearch'))$('saleSearch').value=(savedItem.sku||savedItem.name||'');
+  switchTab('sales');
+  renderSales();
+
+  if(typeof showHgToast==='function'){
+    showHgToast(lang==='ar'?'تمت إضافة الصنف ✓':'Item added ✓');
+  }
+};
+
+function renderStock(){
+  if(!isAdmin()){if($('stockList'))$('stockList').innerHTML='';return}
+  const q=($('stockSearch')?.value||'').trim().toLowerCase();
+  const all=data.stock.slice().sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')));
+  const filtered=q?all.filter(s=>[s.name,s.sku].join(' ').toLowerCase().includes(q)):all;
+  const shown=filtered.slice(0,100);
+  const totalUnits=all.reduce((s,x)=>s+Number(x.qty||0),0);
+  const low=all.filter(x=>Number(x.qty||0)<=Number(x.minQty||0)).length;
+
+  if($('stockKindsStat'))$('stockKindsStat').textContent=`${all.length} ${tr('stockKinds')}`;
+  if($('stockUnitsStat'))$('stockUnitsStat').textContent=`${totalUnits.toLocaleString()} ${tr('stockUnits')}`;
+  if($('stockLowStat'))$('stockLowStat').textContent=`${low} ${tr('stockLow')}`;
+
+  $('stockList').innerHTML=shown.map(s=>`<div style="display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #eee;padding:9px 0">
+    <div><b>${esc(s.name)}</b><div class="muted">${esc(s.sku)} · ${tr('qty')}: ${Number(s.qty||0).toLocaleString()}</div></div>
+    <div style="text-align:end">${Number(s.qty)<=Number(s.minQty||0)?`<span class="pill low-stock">${tr('lowStock')}</span><br>`:''}<b>${money(s.sell)}</b><br><button class="btn danger small" onclick="deleteStock(${JSON.stringify(s.id)})">${tr('delete')}</button></div>
+  </div>`).join('')||`<div class="muted">${tr('noData')}</div>`;
+
+  if($('stockListNote')){
+    $('stockListNote').textContent=filtered.length>100
+      ? `${tr('showingFirst100')} ${filtered.length.toLocaleString()} ${tr('results')}. ${tr('typeSearchNarrow')}`
+      : `${filtered.length.toLocaleString()} ${tr('results')}`;
+  }
+}
+if($('stockSearch'))$('stockSearch').oninput=renderStock;
+
+window.deleteStock=id=>{if(!isAdmin())return;if(confirm(tr('deletePartConfirm'))){const s=data.stock.find(x=>String(x.id)===String(id));data.stock=data.stock.filter(s=>String(s.id)!==String(id));log('STOCK_DELETED',s?.name||'');persist()}};
+
+let saleCart=[];
+
+function saleVisibleStock(){
+  const q=($('saleSearch')?.value||'').trim().toLowerCase();
+  if(!q)return [];
+  return data.stock
+    .filter(s=>Number(s.qty||0)>0 && [s.name,s.sku].join(' ').toLowerCase().includes(q))
+    .sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')))
+    .slice(0,50);
+}
+
+function renderSaleSearch(){
+  if(!$('saleSearchResults'))return;
+  const q=($('saleSearch')?.value||'').trim();
+  if(!q){
+    $('saleSearchResults').innerHTML=`<div class="sale-empty">${tr('searchToFindStock')}</div>`;
+    return;
+  }
+  const arr=saleVisibleStock();
+  $('saleSearchResults').innerHTML=arr.map(s=>`<div class="sale-result">
+    <div class="sale-result-main">
+      <div class="sale-result-name">${esc(s.name)}</div>
+      <div class="muted">${esc(s.sku||'-')} · ${tr('inStock')}: ${Number(s.qty||0).toLocaleString()} · ${money(s.sell)}</div>
+    </div>
+    <button class="btn primary small" onclick="addSaleItem(${JSON.stringify(s.id)})">إضافة</button>
+  </div>`).join('')||`<div class="sale-empty">${tr('noMatchingStock')}</div>`;
+}
+
+window.addSaleItem=id=>{
+  const s=data.stock.find(x=>String(x.id)===String(id));
+  if(!s||Number(s.qty||0)<=0)return;
+  let line=saleCart.find(x=>String(x.stockId)===String(id));
+  if(!line){
+    line={stockId:s.id,name:s.name,sku:s.sku||'',qty:0,price:Number(s.sell||0)};
+    saleCart.push(line);
+  }
+  if(line.qty>=Number(s.qty||0)){alert(tr('noMoreStock'));return}
+  line.qty++;
+  renderSaleCart();
+};
+
+window.changeSaleQty=(id,delta)=>{
+  const line=saleCart.find(x=>String(x.stockId)===String(id)); if(!line)return;
+  const s=data.stock.find(x=>String(x.id)===String(id)); if(!s)return;
+  const next=line.qty+delta;
+  if(next<=0){saleCart=saleCart.filter(x=>String(x.stockId)!==String(id));renderSaleCart();return}
+  if(next>Number(s.qty||0)){alert(tr('qtyOverStock'));return}
+  line.qty=next;renderSaleCart();
+};
+
+function renderSaleCart(){
+  if(!$('saleCart'))return;
+  $('saleCart').innerHTML=saleCart.length?saleCart.map(l=>`<div class="sale-line">
+    <div class="sale-line-main">
+      <div class="sale-line-name">${esc(l.name)}</div>
+      <div class="muted">${esc(l.sku||'-')} · ${money(l.price)} ${tr('unitPrice')}</div>
+    </div>
+    <div class="sale-qty">
+      <button class="btn secondary small" onclick="changeSaleQty(${JSON.stringify(l.stockId)},-1)">−</button>
+      <b>${l.qty}</b>
+      <button class="btn secondary small" onclick="changeSaleQty(${JSON.stringify(l.stockId)},1)">+</button>
+    </div>
+    <b>${money(l.qty*l.price)}</b>
+  </div>`).join(''):`<div class="sale-empty">${tr('emptyCart')}</div>`;
+  const total=saleCart.reduce((s,l)=>s+Number(l.qty||0)*Number(l.price||0),0);
+  if($('saleCartTotal'))$('saleCartTotal').textContent=money(total);
+}
+
+function visibleTodaySales(){
+  const d=today();
+  const arr=data.sales.filter(s=>s.date===d);
+  return isAdmin()?arr:arr.filter(s=>String(s.sellerId)===String(currentUser?.id));
+}
+
+function renderSales(){
+  if(!$('saleCart'))return;
+  renderSaleSearch();
+  renderSaleCart();
+  const arr=visibleTodaySales().sort((a,b)=>String(b.time||'').localeCompare(String(a.time||'')));
+  const total=arr.reduce((s,x)=>s+Number(x.total||0),0);
+  if($('todaySalesTotal'))$('todaySalesTotal').textContent=money(total);
+  if($('todaySalesCount'))$('todaySalesCount').textContent=arr.length.toLocaleString();
+  if($('todaySalesList'))$('todaySalesList').innerHTML=arr.slice(0,100).map(s=>`<div class="sale-history-row">
+    <div style="display:flex;justify-content:space-between;gap:10px">
+      <div><b>#${String(s.id).slice(-6)}</b> · ${esc(s.sellerName||'')}<div class="muted">${esc(s.time||'')} · ${esc(s.customer||'')} · ${esc(s.payment||'')}</div></div>
+      <b>${money(s.total)}</b>
+    </div>
+    <div class="muted">${(s.lines||[]).map(l=>`${esc(l.name)} × ${l.qty}`).join(' · ')}</div>
+  </div>`).join('')||`<div class="sale-empty">${tr('noSalesToday')}</div>`;
+}
+
+if($('saleSearch'))$('saleSearch').oninput=renderSaleSearch;
+if($('clearSaleBtn'))$('clearSaleBtn').onclick=()=>{saleCart=[];renderSaleCart()};
+
+
+
+
+
+let saleSaving=false;
+
+window.completeSaleNow=function(ev){
+  if(ev){try{ev.preventDefault();ev.stopPropagation()}catch(e){}}
+  if(saleSaving)return false;
+  if(!currentUser||!(isAdmin()||currentUser.role==='seller'))return false;
+
+  if(!saleCart.length){
+    alert(tr('emptyCart'));
+    return false;
+  }
+
+  for(const line of saleCart){
+    const s=data.stock.find(x=>String(x.id)===String(line.stockId));
+    if(!s||Number(s.qty||0)<Number(line.qty||0)){
+      alert(`${tr('insufficientStock')}: ${line.name}`);
+      renderSaleSearch();
+      renderSaleCart();
+      return false;
+    }
+  }
+
+  saleSaving=true;
+  const btn=$('completeSaleBtn');
+  if(btn)btn.disabled=true;
+
+  const lines=saleCart.map(l=>({
+    stockId:l.stockId,
+    name:l.name,
+    sku:l.sku,
+    qty:Number(l.qty),
+    price:Number(l.price),
+    subtotal:Number(l.qty)*Number(l.price)
+  }));
+  const total=lines.reduce((s,l)=>s+l.subtotal,0);
+
+  // Deduct stock.
+  for(const line of lines){
+    const s=data.stock.find(x=>String(x.id)===String(line.stockId));
+    s.qty=Number(s.qty||0)-Number(line.qty||0);
+  }
+
+  const sale={
+    id:'sale-'+Date.now(),
+    date:today(),
+    time:timeNow(),
+    createdAt:nowIso(),
+    sellerId:currentUser.id,
+    sellerName:currentUser.name,
+    customer:$('saleCustomer')?.value.trim()||'',
+    payment:$('salePayment')?.value||'cash',
+    lines,
+    total
+  };
+
+  data.sales.unshift(sale);
+  log('SALE_COMPLETED',`${sale.sellerName} · ${money(total)}`);
+  persist();
+
+  // Clear the sale screen completely.
+  saleCart=[];
+  if($('saleCustomer'))$('saleCustomer').value='';
+  if($('saleSearch'))$('saleSearch').value='';
+  if($('salePayment'))$('salePayment').value='cash';
+  renderSaleSearch();
+  renderSaleCart();
+
+  // Refresh stock and totals.
+  if(isAdmin())renderStock();
+  renderSales();
+  try{renderDashboard()}catch(e){}
+  try{renderReports()}catch(e){}
+
+  // Close the selling page and show a clean "Sold" result.
+  if($('saleDoneAmount'))$('saleDoneAmount').textContent=money(total);
+  switchTab('salesDone');
+
+  setTimeout(()=>{
+    saleSaving=false;
+    if(btn)btn.disabled=false;
+  },350);
+
+  return false;
+};
+
+if($('newSaleBtn'))$('newSaleBtn').onclick=()=>{
+  saleCart=[];
+  if($('saleCustomer'))$('saleCustomer').value='';
+  if($('saleSearch'))$('saleSearch').value='';
+  if($('salePayment'))$('salePayment').value='cash';
+  renderSales();
+  switchTab('sales');
+};
+
+$('addUserBtn').onclick=()=>{
+  if(!isAdmin())return;
+  const name=$('uName').value.trim(),username=$('uUsername').value.trim().toLowerCase(),password=$('uPassword').value;
+  if(!name||!username||!password){alert(tr('enterEmployeeFields'));return}
+  if(data.users.some(u=>u.username.toLowerCase()===username)){alert(tr('usernameUsed'));return}
+  const selected=$('uRole')?.value||'employee';
+  const role=['mechanic','seller'].includes(selected)?selected:'employee';
+  const phone=$('uPhone')?.value.trim()||'';
+  const permission=role==='mechanic'?'worker':role==='seller'?'sales':'intake';
+  data.users.push({id:'u-'+Date.now(),name,phone,username,password,role,permissions:[permission],canApprove:false,active:true});
+  log('USER_CREATED',username);
+  persist();
+  ['uName','uPhone','uUsername','uPassword'].forEach(id=>$(id).value='');
+  if($('uRole'))$('uRole').value='employee';
+};
+function renderUsers(){if(!$('usersList')||!isAdmin())return;$('usersList').innerHTML=data.users.map(u=>`<div style="padding:10px 0;border-bottom:1px solid #eee;display:flex;justify-content:space-between;gap:10px"><div><b>${esc(u.name)}</b> <span class="pill">${roleLabel(u.role)}</span><div class="muted">${esc(u.username)}${u.phone?' · '+esc(u.phone):''} · ${roleLabel(u.role)} · ${u.active!==false?tr('active'):tr('disabled')}</div></div><div>${u.role!=='admin'?`<button class="btn ${u.active!==false?'danger':'success'} small" onclick="toggleUser('${u.id}')">${u.active!==false?tr('disable'):tr('enable')}</button>`:''}</div></div>`).join('')}
+window.toggleUser=id=>{if(currentUser.role!=='admin')return;const u=data.users.find(x=>x.id===id);if(!u)return;u.active=u.active===false;log(u.active?'USER_ENABLED':'USER_DISABLED',u.username);persist()};
+function auditActionLabel(a){return tr(a.action)}
+function auditName(a){if(a.user==='customer'||a.name==='Customer')return tr('customerRole');return a.name||a.user}
+function renderAudit(){if(!isAdmin())return;const html=data.audit.slice(0,100).map(a=>`<div class="audit"><b>${esc(auditName(a))}</b> — ${esc(auditActionLabel(a))} ${a.detail?`· ${esc(a.detail)}`:''}<div class="muted">${fmtDateTime(a.time)}</div></div>`).join('')||`<div class="muted">${tr('noActivity')}</div>`;$('auditList').innerHTML=html;$('recentAudit').innerHTML=data.audit.slice(0,8).map(a=>`<div class="audit"><b>${esc(auditName(a))}</b> — ${esc(auditActionLabel(a))}<div class="muted">${esc(a.detail||'')} · ${fmtDateTime(a.time)}</div></div>`).join('')||`<div class="muted">${tr('noActivity')}</div>`}
+$('exportBtn').onclick=()=>{if(!isAdmin())return;const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hassan-garage-backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)};
+$('importFile').onchange=e=>{if(!isAdmin())return;const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.jobs)||!Array.isArray(d.stock)||!Array.isArray(d.users))throw Error();data=d;if(!Array.isArray(data.sales))data.sales=[];log('BACKUP_RESTORED');persist();alert(tr('backupRestored'))}catch{alert(tr('invalidFile'))}};r.readAsText(f)};
+function renderInsideCars(){
+  if(!$('insideCarsList'))return;
+  const arr=data.jobs
+    .filter(j=>j.status!=='delivered')
+    .sort((a,b)=>((b.dateIn||'')+' '+(b.timeIn||'')).localeCompare((a.dateIn||'')+' '+(a.timeIn||'')));
+  if($('insideCarsCount'))$('insideCarsCount').textContent=(lang==='ar'?`${arr.length} سيارة`:`${arr.length} cars`);
+  if(!arr.length){
+    $('insideCarsList').innerHTML=`<div class="muted" style="padding:20px;text-align:center">${lang==='ar'?'لا توجد سيارات داخل الغاراج حالياً':'No vehicles are currently in the garage'}</div>`;
+    return;
+  }
+  $('insideCarsList').innerHTML=arr.map(j=>`<div class="inside-car-card">
+    <div class="inside-car-head">
+      <div>
+        <div class="inside-car-title"><span class="garage-dot"></span>${esc(j.plate||'-')} · ${esc([j.make,j.model,j.year].filter(Boolean).join(' ')||'-')}</div>
+        <div class="inside-car-meta">${esc(j.customer||'-')} · ${esc(j.phone||'')}</div>
+        <div class="inside-car-meta">VIN: ${esc(j.vin||'-')} · ${esc(j.color||'-')}</div>
+        <div class="inside-car-meta">${tr('dateIn')}: ${esc(j.dateIn||'')} ${esc(j.timeIn||'')} · ${tr('assignedWorker')}: ${esc(j.assignedWorkerName||tr('unassignedWorker'))}</div>
+      </div>
+      <span class="pill">${tr(j.status||'open')}</span>
+    </div>
+    <div class="inside-car-actions">
+      ${isAdmin()?`<button class="btn secondary small" onclick="openEditor(${j.id},'inside')">${tr('openFile')}</button>`:''}
+    </div>
+  </div>`).join('');
+}
+
+function renderExitedCars(){
+  if(!$('exitedCarsList'))return;
+  const arr=data.jobs
+    .filter(j=>j.status==='delivered')
+    .sort((a,b)=>((b.dateOut||b.dateIn||'')+' '+(b.timeOut||b.timeIn||'')).localeCompare((a.dateOut||a.dateIn||'')+' '+(a.timeOut||a.timeIn||'')));
+
+  if($('exitedCarsCount')) $('exitedCarsCount').textContent=(lang==='ar'?`${arr.length} سيارة`:`${arr.length} cars`);
+
+  if(!arr.length){
+    $('exitedCarsList').innerHTML=`<div class="muted" style="padding:20px;text-align:center">${lang==='ar'?'لا توجد سيارات خارجة بعد':'No exited vehicles yet'}</div>`;
+    return;
+  }
+
+  $('exitedCarsList').innerHTML=arr.map(j=>`<div class="inside-car-card">
+    <div class="inside-car-head">
+      <div>
+        <div class="inside-car-title">✅ ${esc(j.plate||'-')} · ${esc([j.make,j.model,j.year].filter(Boolean).join(' ')||'-')}</div>
+        <div class="inside-car-meta">${esc(j.customer||'-')} · ${esc(j.phone||'')}</div>
+        <div class="inside-car-meta">${tr('dateIn')}: ${esc(j.dateIn||'')} ${esc(j.timeIn||'')}</div>
+        <div class="inside-car-meta">${tr('dateOut')}: ${esc(j.dateOut||'')} ${esc(j.timeOut||'')}</div>
+        <div class="inside-car-meta">VIN: ${esc(j.vin||'-')} · ${esc(j.color||'-')}</div>
+      </div>
+      <span class="pill">${tr('delivered')}</span>
+    </div>
+    <div class="inside-car-actions">
+      ${isAdmin()?`<button class="btn secondary small" onclick="openEditor(${j.id},'exited')">${tr('openFile')}</button>`:''}
+    </div>
+  </div>`).join('');
+}
+
+function renderDashboard(){if(!isAdmin())return;const d=today();const garageTotal=data.jobs.filter(j=>(j.dateIn||'')===d).reduce((sum,j)=>sum+jobTotal(j),0);const stockSalesTotal=data.sales.filter(s=>s.date===d).reduce((sum,s)=>sum+Number(s.total||0),0);const todayTotal=garageTotal+stockSalesTotal;$('statPending').textContent=data.bookings.filter(b=>b.status==='pending').length;$('statOpen').textContent=data.jobs.filter(j=>j.status!=='delivered').length;$('statStock').textContent=data.stock.length;const low=data.stock.filter(x=>Number(x.qty)<=Number(x.minQty||0)).length;$('statLowStock').textContent=low?`${tr('lowStock')}: ${low}`:'';$('statTodayTotal').textContent=money(todayTotal);$('statTodayDate').textContent=displayDay(d);renderAudit()}
+
+function activeWorkers(){return data.users.filter(u=>(u.role==='mechanic'||u.role==='employee')&&u.active!==false)}
+function renderIntakeWorkerOptions(){const el=$('intakeWorker');if(!el)return;const prev=el.value;el.innerHTML=`<option value="">${tr('unassignedWorker')}</option>`+activeWorkers().map(u=>`<option value="${esc(u.id)}">${esc(u.name)}</option>`).join('');if(activeWorkers().some(u=>u.id===prev))el.value=prev}
+function normalizePhone(p){return String(p||'').replace(/\D/g,'')}
+function openWhatsApp(phone,msg){const p=normalizePhone(phone);if(!p){alert(lang==='ar'?'لا يوجد رقم واتساب':'No WhatsApp number');return}window.open(`https://wa.me/${p}?text=${encodeURIComponent(msg)}`,'_blank')}
+function sendWorkerWhatsApp(j,worker){openWhatsApp(worker.phone,lang==='ar'?`Hassan Garage\nتم تعيينك للعمل على السيارة: ${[j.make,j.model,j.year].filter(Boolean).join(' ')}\nرقم اللوحة: ${j.plate}\nVIN: ${j.vin||'-'}\nابدأ العمل عليها من فضلك.`:`Hassan Garage\nYou were assigned this vehicle: ${[j.make,j.model,j.year].filter(Boolean).join(' ')}\nPlate: ${j.plate}\nVIN: ${j.vin||'-'}\nPlease start working on it.`)}
+
+let exitBusy=false;
+window.exitVehicleNow=function(ev){
+  if(ev){try{ev.preventDefault();ev.stopPropagation()}catch(e){}}
+  if(exitBusy)return false;
+
+  const j=data.jobs.find(x=>String(x.id)===String(currentId));
+  if(!j){
+    alert(lang==='ar'?'لم أجد ملف السيارة المفتوح. افتح السيارة من جديد وحاول.':'Open vehicle record not found. Reopen it and try again.');
+    return false;
+  }
+
+  exitBusy=true;
+
+  // Save what is currently visible in the vehicle file.
+  const workerId=$('assignedWorker')?.value||j.assignedWorkerId||'';
+  const worker=data.users.find(u=>String(u.id)===String(workerId));
+  j.assignedWorkerId=workerId;
+  j.assignedWorkerName=worker?.name||j.assignedWorkerName||'';
+  j.color=$('editColor')?.value.trim()||j.color||'';
+  j.vin=$('editVin')?.value.trim()||j.vin||'';
+  j.dateIn=$('editDateIn')?.value||j.dateIn||today();
+  j.timeIn=$('editTimeIn')?.value||j.timeIn||timeNow();
+  j.workDone=$('workDone')?.value||j.workDone||'';
+  j.labor=Number($('labor')?.value||j.labor||0);
+  j.discount=Number($('discount')?.value||j.discount||0);
+  j.paid=Number($('paid')?.value||j.paid||0);
+
+  // Exit immediately.
+  j.status='delivered';
+  j.dateOut=today();
+  j.timeOut=timeNow();
+
+  try{log('VEHICLE_EXITED',`${j.customer||''} ${j.plate||''}`)}catch(e){}
+  try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){console.error(e)}
+
+  // Repaint both lists before navigating.
+  try{renderInsideCars()}catch(e){}
+  try{renderExitedCars()}catch(e){}
+  try{renderDashboard()}catch(e){}
+  try{renderJobs()}catch(e){}
+  try{renderArchive()}catch(e){}
+  try{renderReports()}catch(e){}
+
+  currentId=null;
+  try{switchTab('exited')}catch(e){}
+  try{showHgToast(lang==='ar'?'تم خروج السيارة ✓':'Vehicle exited ✓')}catch(e){}
+
+  setTimeout(()=>{exitBusy=false},450);
+  return false;
+};
+
+if($('workerWhatsAppBtn'))$('workerWhatsAppBtn').onclick=()=>{const j=data.jobs.find(x=>x.id===currentId);if(!j)return;const w=data.users.find(u=>u.id===j.assignedWorkerId);if(!w?.phone){alert(lang==='ar'?'الشغيل ليس عنده رقم واتساب محفوظ':'No saved WhatsApp number for this mechanic');return}sendWorkerWhatsApp(j,w)};
+
+function resizeImageFile(file,maxSide=900,quality=.66){return new Promise((resolve,reject)=>{if(!file){resolve('');return}const r=new FileReader();r.onerror=reject;r.onload=()=>{const img=new Image();img.onerror=reject;img.onload=()=>{let w=img.width,h=img.height;const scale=Math.min(1,maxSide/Math.max(w,h));w=Math.round(w*scale);h=Math.round(h*scale);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);resolve(c.toDataURL('image/jpeg',quality))};img.src=r.result};r.readAsDataURL(file)})}
+function renderFaultReports(j){if(!$('faultReportsList'))return;$('faultReportsList').innerHTML=(j.faultReports||[]).map(f=>`<div class="fault-box"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(f.code||'-')}</b><span class="muted">${fmtDateTime(f.time)}</span></div><div>${esc(f.note||'')}</div><div class="muted">${esc(f.workerName||'')}</div>${f.image?`<img class="fault-photo" src="${f.image}">`:''}<div class="actions"><button class="btn danger small" onclick="removeFault('${f.id}')">${tr('delete')}</button></div></div>`).join('')||`<div class="muted">${tr('noData')}</div>`}
+if($('addFaultBtn'))$('addFaultBtn').onclick=async()=>{const j=data.jobs.find(x=>x.id===currentId);if(!j)return;const code=$('faultCode').value.trim().toUpperCase(),note=$('faultNote').value.trim(),file=$('faultPhoto').files[0];if(!code&&!note&&!file)return;let image='';try{image=await resizeImageFile(file)}catch{}const w=data.users.find(u=>u.id===j.assignedWorkerId);j.faultReports.unshift({id:'f-'+Date.now(),code,note,image,time:nowIso(),workerId:w?.id||'',workerName:w?.name||''});log('FAULT_ADDED',`${j.plate} · ${code||note}`);persist();$('faultCode').value='';$('faultNote').value='';$('faultPhoto').value='';openEditor(j.id,lastListTab)};
+window.removeFault=id=>{const j=data.jobs.find(x=>x.id===currentId);if(!j)return;j.faultReports=(j.faultReports||[]).filter(f=>f.id!==id);persist();openEditor(j.id,lastListTab)};
+function renderLaborSplits(j){if(!$('splitWorker'))return;const workers=activeWorkers();$('splitWorker').innerHTML=`<option value="">${tr('unassignedWorker')}</option>`+workers.map(w=>`<option value="${esc(w.id)}">${esc(w.name)}</option>`).join('');$('laborSplitsList').innerHTML=(j.laborSplits||[]).map(x=>`<div class="prod-row"><div><b>${esc(x.workerName)}</b><div class="muted">${money(x.amount)}</div></div><button class="btn danger small" onclick="removeSplit('${x.id}')">${tr('delete')}</button></div>`).join('')||`<div class="muted">${tr('noData')}</div>`}
+if($('addSplitBtn'))$('addSplitBtn').onclick=()=>{const j=data.jobs.find(x=>x.id===currentId);if(!j)return;const wid=$('splitWorker').value,w=data.users.find(u=>u.id===wid),amount=Number($('splitAmount').value||0);if(!w||amount<=0)return;j.laborSplits=j.laborSplits||[];j.laborSplits.push({id:'s-'+Date.now(),workerId:w.id,workerName:w.name,amount});log('LABOR_SPLIT_ADDED',`${j.plate} · ${w.name} ${money(amount)}`);persist();$('splitAmount').value=0;openEditor(j.id,lastListTab)};
+window.removeSplit=id=>{const j=data.jobs.find(x=>x.id===currentId);if(!j)return;j.laborSplits=(j.laborSplits||[]).filter(x=>x.id!==id);persist();openEditor(j.id,lastListTab)};
+function renderPartsRequests(j){if(!$('partsRequestsList'))return;$('partsRequestsList').innerHTML=(j.partsRequests||[]).map(x=>`<div class="fault-box"><b>${esc(x.text)}</b><div class="muted">${esc(x.workerName||'')} · ${fmtDateTime(x.time)}</div></div>`).join('')||`<div class="muted">${tr('noData')}</div>`}
+function renderMyWork(){if(!$('workerJobs')||currentUser?.role!=='mechanic')return;const jobs=data.jobs.filter(j=>j.assignedWorkerId===currentUser.id&&j.status!=='delivered');$('workerJobs').innerHTML=jobs.map(j=>`<div class="vehicle-card"><div class="vc-top"><span class="garage-dot"></span><div class="vc-main"><div class="vc-title">${esc(j.plate)} · ${esc([j.make,j.model,j.year].filter(Boolean).join(' '))}</div><div class="vc-sub">VIN: ${esc(j.vin||'-')} · ${esc(j.customer||'')}</div></div><span class="pill">${tr(j.status)}</span></div><div class="notice" style="margin-top:10px">${esc(j.complaint||'-')}</div><div class="actions"><button class="btn primary small" onclick="workerStart(${j.id})">${tr('startWork')}</button><button class="btn secondary small" onclick="workerRequestParts(${j.id})">${tr('requestParts')}</button><button class="btn success small" onclick="workerFinish(${j.id})">${tr('finishWork')}</button></div><div style="margin-top:12px"><label>${tr('faultCode')}</label><input id="wcode${j.id}" placeholder="P0300"><label style="margin-top:8px">${tr('faultNote')}</label><textarea id="wnote${j.id}"></textarea><label style="margin-top:8px">${tr('faultPhoto')}</label><input id="wphoto${j.id}" type="file" accept="image/*" capture="environment"><button class="btn warning" style="margin-top:8px;width:100%" onclick="workerSaveFault(${j.id})">📷 ${tr('reportFault')}</button></div></div>`).join('')||`<div class="muted">${tr('noData')}</div>`}
+window.workerStart=id=>{const j=data.jobs.find(x=>x.id===id);if(!j||j.assignedWorkerId!==currentUser.id)return;j.startedAt=nowIso();log('WORK_STARTED',`${j.plate}`);persist()};
+window.workerRequestParts=id=>{const j=data.jobs.find(x=>x.id===id);if(!j||j.assignedWorkerId!==currentUser.id)return;const text=prompt(lang==='ar'?'اكتب القطع المطلوبة':'Enter needed parts');if(!text)return;j.partsRequests=j.partsRequests||[];j.partsRequests.unshift({id:'p-'+Date.now(),text,workerId:currentUser.id,workerName:currentUser.name,time:nowIso()});log('PARTS_REQUESTED',`${j.plate} · ${text}`);persist()};
+window.workerFinish=id=>{const j=data.jobs.find(x=>x.id===id);if(!j||j.assignedWorkerId!==currentUser.id)return;j.status='ready';j.finishedByWorkerAt=nowIso();log('WORK_FINISHED',j.plate);persist()};
+window.workerSaveFault=async id=>{const j=data.jobs.find(x=>x.id===id);if(!j||j.assignedWorkerId!==currentUser.id)return;const code=$(`wcode${id}`).value.trim().toUpperCase(),note=$(`wnote${id}`).value.trim(),file=$(`wphoto${id}`).files[0];if(!code&&!note&&!file)return;let image='';try{image=await resizeImageFile(file)}catch{}j.faultReports=j.faultReports||[];j.faultReports.unshift({id:'f-'+Date.now(),code,note,image,time:nowIso(),workerId:currentUser.id,workerName:currentUser.name});log('FAULT_ADDED',`${j.plate} · ${code||note}`);persist()};
+function dateRangeForPeriod(){const p=$('reportPeriod')?.value||'month',now=new Date();let from,to;const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');if(p==='today'){from=to=iso(now)}else if(p==='week'){const d=new Date(now),day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);from=iso(d);to=iso(now)}else if(p==='month'){from=iso(new Date(now.getFullYear(),now.getMonth(),1));to=iso(now)}else{from=$('reportFrom')?.value||'0000-01-01';to=$('reportTo')?.value||'9999-12-31'}return{from,to}}
+function laborCreditForWorker(j,wid){const splits=j.laborSplits||[];if(splits.length)return splits.filter(x=>x.workerId===wid).reduce((s,x)=>s+Number(x.amount||0),0);return j.assignedWorkerId===wid?Number(j.labor||0):0}
+function renderReports(){if(!isAdmin()||!$('workerProductionList'))return;const {from,to}=dateRangeForPeriod();const jobs=data.jobs.filter(j=>(j.dateIn||'')>=from&&(j.dateIn||'')<=to);const labor=jobs.reduce((s,j)=>s+Number(j.labor||0),0),invoice=jobs.reduce((s,j)=>s+jobTotal(j),0),paid=jobs.reduce((s,j)=>s+Number(j.paid||0),0),balance=Math.max(0,invoice-paid);$('reportLaborTotal').textContent=money(labor);$('reportInvoiceTotal').textContent=money(invoice);$('reportCarsCount').textContent=`${tr('invoiceCount')}: ${jobs.length}`;$('reportBalanceTotal').textContent=`${tr('paidTotal')}: ${money(paid)} · ${tr('balanceTotal')}: ${money(balance)}`;const workers=activeWorkers().map(w=>({w,amount:jobs.reduce((s,j)=>s+laborCreditForWorker(j,w.id),0),cars:jobs.filter(j=>(j.laborSplits||[]).some(x=>x.workerId===w.id)||(!(j.laborSplits||[]).length&&j.assignedWorkerId===w.id)).length})).sort((a,b)=>b.amount-a.amount);$('workerProductionList').innerHTML=workers.map(x=>`<div class="prod-row"><div><b>${esc(x.w.name)}</b><div class="muted">${x.cars} ${tr('invoiceCount')}</div></div><b>${money(x.amount)}</b></div>`).join('')||`<div class="muted">${tr('noData')}</div>`}
+if($('refreshReports'))$('refreshReports').onclick=renderReports;if($('reportPeriod'))$('reportPeriod').onchange=renderReports;if($('reportFrom'))$('reportFrom').onchange=renderReports;if($('reportTo'))$('reportTo').onchange=renderReports;
+
+function renderAll(){
+  if(!currentUser&&$('appShell').classList.contains('hidden'))return;
+  renderIntakeWorkerOptions();
+  renderInsideCars();
+  renderExitedCars();
+
+  if(isAdmin()){
+    renderDashboard();
+    renderBookings();
+    renderJobs();
+    renderArchive();
+    renderStock();    renderUsers();
+    renderAudit();
+    renderReports();
+    renderSales();
+  }
+
+  if(currentUser?.role==='mechanic')renderMyWork();
+  if(currentUser?.role==='seller')renderSales();
+}
+applyLang();renderAll();
+</script>
+</body></html>
