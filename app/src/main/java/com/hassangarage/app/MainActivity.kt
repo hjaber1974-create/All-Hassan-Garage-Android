@@ -29,6 +29,7 @@ data class GarageJob(
     val parkingFee: Double = 100.0
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HassanGarageApp() {
     var selectedTab by remember { mutableIntStateOf(0) }
