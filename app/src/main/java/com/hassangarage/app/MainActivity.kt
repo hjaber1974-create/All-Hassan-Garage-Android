@@ -44,8 +44,12 @@ class MainActivity : ComponentActivity() {
                 ): Boolean {
                     this@MainActivity.filePathCallback?.onReceiveValue(null)
                     this@MainActivity.filePathCallback = filePathCallback
+                    if (fileChooserParams == null) {
+                        this@MainActivity.filePathCallback = null
+                        return false
+                    }
                     return try {
-                        fileChooserLauncher.launch(fileChooserParams?.createIntent())
+                        fileChooserLauncher.launch(fileChooserParams.createIntent())
                         true
                     } catch (_: Exception) {
                         this@MainActivity.filePathCallback = null
