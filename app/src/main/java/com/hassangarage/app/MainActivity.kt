@@ -8,6 +8,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -77,7 +78,22 @@ class MainActivity : ComponentActivity() {
             loadUrl("file:///android_asset/index.html")
         }
 
-        setContentView(webView)
+        val root = FrameLayout(this)
+        root.addView(
+            webView,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+        )
+        root.setOnApplyWindowInsetsListener { _, insets ->
+            val lp = webView.layoutParams as FrameLayout.LayoutParams
+            lp.bottomMargin = insets.systemWindowInsetBottom
+            webView.layoutParams = lp
+            insets
+        }
+        setContentView(root)
+        root.requestApplyInsets()
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
