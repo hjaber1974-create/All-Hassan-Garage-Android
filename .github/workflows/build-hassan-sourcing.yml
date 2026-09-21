@@ -24,7 +24,7 @@ jobs:
           test -n "$SDKMANAGER"
           yes | "$SDKMANAGER" --licenses >/dev/null || true
           "$SDKMANAGER" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
-      - name: Build V2.3 native APK
+      - name: Build V2.4 native APK
         working-directory: HassanSourcingV23
         run: gradle :app:assembleDebug --stacktrace
       - name: Verify APK
@@ -36,6 +36,6 @@ jobs:
           "$APKSIGNER" verify --verbose "$APK"
       - uses: actions/upload-artifact@v4
         with:
-          name: Hassan-Sourcing-V2.3-APK
+          name: Hassan-Sourcing-V2.4-APK
           path: HassanSourcingV23/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
