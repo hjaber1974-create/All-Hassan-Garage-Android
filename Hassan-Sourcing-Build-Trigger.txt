@@ -1,1 +1,1 @@
-Build Hassan Sourcing V2.1 - sdkmanager path fix
+Build Hassan Sourcing V2.2 standalone package
