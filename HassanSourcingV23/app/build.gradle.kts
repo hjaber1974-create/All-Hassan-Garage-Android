@@ -6,11 +6,11 @@ android {
   namespace = "com.hassansourcing.safe"
   compileSdk = 35
   defaultConfig {
-    applicationId = "com.hassansourcing.safe"
+    applicationId = "com.hassansourcing.shop"
     minSdk = 24
     targetSdk = 35
-    versionCode = 23
-    versionName = "2.3"
+    versionCode = 24
+    versionName = "2.4"
   }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_17
