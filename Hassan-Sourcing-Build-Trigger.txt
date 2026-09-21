@@ -1,1 +1,1 @@
-Build Hassan Sourcing V2.1 - Android SDK workflow fix
+Build Hassan Sourcing V2.1 - sdkmanager path fix
