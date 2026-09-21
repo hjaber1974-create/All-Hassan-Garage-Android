@@ -196,18 +196,18 @@ class MainActivity: Activity(){
       setPadding(0,dp(12),0,dp(8))
     })
 
-    items.forEach{it->
-      val photos=db.getItemPhotos(it.id)
+    items.forEach{item->
+      val photos=db.getItemPhotos(item.id)
       val c=card()
       val row=LinearLayout(this).apply{orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER_VERTICAL}
       if(photos.isNotEmpty() && File(photos[0].path).exists()) row.addView(thumb(photos[0].path,70))
       val tx=TextView(this).apply{
-        text="${it.name.ifBlank{"Item #${it.id}"}}\n${it.price} ${it.currency}   •   ${photos.size} photo(s)"
+        text="${item.name.ifBlank{"Item #${item.id}"}}\n${item.price} ${item.currency}   •   ${photos.size} photo(s)"
         textSize=16f;setTextColor(ink)
       }
       row.addView(tx,LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,1f))
       c.addView(row)
-      c.setOnClickListener{saveHeader();openItemEditor(shopId,it.id)}
+      c.setOnClickListener{saveHeader();openItemEditor(shopId,item.id)}
       r.addView(c,lp(6))
     }
 
