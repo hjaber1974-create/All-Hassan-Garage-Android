@@ -27,7 +27,7 @@ class MainActivity: Activity(){
   private fun fatal(e:Throwable){val t=TextView(this);t.text="Hassan Sourcing startup error\n\n${e.javaClass.simpleName}: ${e.message}";t.setTextColor(Color.RED);t.textSize=18f;t.setPadding(dp(20),dp(40),dp(20),dp(20));setContentView(t)}
   private fun root():Pair<ScrollView,LinearLayout>{val s=ScrollView(this);s.setBackgroundColor(bg);val l=LinearLayout(this);l.orientation=LinearLayout.VERTICAL;l.setPadding(dp(16),dp(16),dp(16),dp(24));s.addView(l);return s to l}
   private fun title(s:String)=TextView(this).apply{text=s;textSize=25f;setTextColor(this@MainActivity.text);setTypeface(typeface,android.graphics.Typeface.BOLD);setPadding(0,0,0,dp(10))}
-  private fun field(h:String)=EditText(this).apply{hint=h;setTextColor(text);setHintTextColor(0xFF788AA0.toInt());backgroundTintList=android.content.res.ColorStateList.valueOf(blue)}
+  private fun field(h:String)=EditText(this).apply{hint=h;setTextColor(this@MainActivity.text);setHintTextColor(0xFF788AA0.toInt());backgroundTintList=android.content.res.ColorStateList.valueOf(blue)}
   private fun button(label:String,color:Int=blue,click:()->Unit)=Button(this).apply{text=label;isAllCaps=false;textSize=16f;setTextColor(Color.WHITE);backgroundTintList=android.content.res.ColorStateList.valueOf(color);setOnClickListener{click()}}
   private fun lp(m:Int=8)=LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT).apply{setMargins(0,0,0,dp(m))}
   private fun iconRow(icon:Int,en:String,ar:String,click:()->Unit):View{
@@ -39,7 +39,7 @@ class MainActivity: Activity(){
   private fun suppliers()=try{db.getSuppliers()}catch(_:Throwable){emptyList()}
   private fun products()=try{db.getProducts()}catch(_:Throwable){emptyList()}
   private fun showHome(){screen="home";val(s,r)=root();r.addView(title("Hassan Sourcing"));r.addView(TextView(this).apply{text="V2.3 SAFE • Native Android";setTextColor(blue);textSize=15f},lp())
-    r.addView(TextView(this).apply{text="Suppliers / موردين: ${suppliers().size}     Items / أصناف: ${products().size}";textSize=17f;setTextColor(text);setPadding(dp(10),dp(14),dp(10),dp(14));setBackgroundColor(Color.WHITE)},lp(12))
+    r.addView(TextView(this).apply{text="Suppliers / موردين: ${suppliers().size}     Items / أصناف: ${products().size}";textSize=17f;setTextColor(this@MainActivity.text);setPadding(dp(10),dp(14),dp(10),dp(14));setBackgroundColor(Color.WHITE)},lp(12))
     r.addView(iconRow(android.R.drawable.ic_menu_add,"Add Supplier","إضافة مورد"){supplierForm()},lp())
     r.addView(iconRow(android.R.drawable.ic_input_add,"Add Item","إضافة صنف"){if(suppliers().isEmpty()){toast("Add supplier first / أضف مورد أولاً");supplierForm()}else productForm()},lp())
     r.addView(iconRow(android.R.drawable.ic_menu_agenda,"Suppliers & Items","عرض البيانات"){listData()},lp())
@@ -48,7 +48,7 @@ class MainActivity: Activity(){
     setContentView(s)
   }
   private fun supplierForm(){screen="supplier";val(s,r)=root();r.addView(title("Add Supplier / إضافة مورد"));val fs=listOf("Supplier / Company name *","Contact person","Phone","WhatsApp","WeChat","Email","Address","Notes").map{field(it)};fs.forEach{r.addView(it,lp(5))}
-    r.addView(button("Save Supplier / حفظ المورد"){if(fs[0].text.toString().trim().isEmpty()){toast("Supplier name required");return@button};val id=db.addSupplier(*fs.map{it.text.toString()}.toTypedArray());if(id>0){refreshExcel();toast("Supplier Added ✓");showHome()}else toast("Save failed")},lp())
+    r.addView(button("Save Supplier / حفظ المورد"){if(fs[0].text.toString().trim().isEmpty()){toast("Supplier name required");return@button};val id=db.addSupplier(fs[0].text.toString(),fs[1].text.toString(),fs[2].text.toString(),fs[3].text.toString(),fs[4].text.toString(),fs[5].text.toString(),fs[6].text.toString(),fs[7].text.toString());if(id>0){refreshExcel();toast("Supplier Added ✓");showHome()}else toast("Save failed")},lp())
     r.addView(button("Back / رجوع",0xFF6C7A8A.toInt()){showHome()});setContentView(s)
   }
   private fun productForm(){screen="product";val ss=suppliers();if(ss.isEmpty()){supplierForm();return};val(s,r)=root();r.addView(title("Add Item / إضافة صنف"));val sp=Spinner(this);sp.adapter=ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,ss.map{it.name});r.addView(sp,lp())
@@ -56,7 +56,7 @@ class MainActivity: Activity(){
     r.addView(button("Add Item / إضافة الصنف"){if(fs[0].text.toString().trim().isEmpty()){toast("Item name required");return@button};val x=fs.map{it.text.toString()};val id=db.addProduct(ss[sp.selectedItemPosition].id,x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7]);if(id>0){refreshExcel();toast("Item Added ✓ / تمت إضافة الصنف");listData()}else toast("Save failed")},lp())
     r.addView(button("Back / رجوع",0xFF6C7A8A.toInt()){showHome()});setContentView(s)
   }
-  private fun listData(){screen="list";val(s,r)=root();r.addView(title("Suppliers & Items / الموردين والأصناف"));val ps=products();suppliers().forEach{x->r.addView(TextView(this).apply{text=x.name;textSize=19f;setTypeface(typeface,android.graphics.Typeface.BOLD);setTextColor(blue);setPadding(dp(10),dp(10),dp(10),dp(8));setBackgroundColor(Color.WHITE)},lp(3));val its=ps.filter{it.supplierId==x.id};if(its.isEmpty())r.addView(TextView(this).apply{text="No items / لا يوجد أصناف";setTextColor(text)},lp()) else its.forEach{p->r.addView(TextView(this).apply{text="• ${p.name}   ${p.price} ${p.currency}\n  MOQ: ${p.moq}   Carton: ${p.cartonQty}";textSize=16f;setTextColor(text);setPadding(dp(14),dp(9),dp(8),dp(9));setBackgroundColor(0xFFEDF3FC.toInt())},lp(3))}}
+  private fun listData(){screen="list";val(s,r)=root();r.addView(title("Suppliers & Items / الموردين والأصناف"));val ps=products();suppliers().forEach{x->r.addView(TextView(this).apply{text=x.name;textSize=19f;setTypeface(typeface,android.graphics.Typeface.BOLD);setTextColor(blue);setPadding(dp(10),dp(10),dp(10),dp(8));setBackgroundColor(Color.WHITE)},lp(3));val its=ps.filter{it.supplierId==x.id};if(its.isEmpty())r.addView(TextView(this).apply{text="No items / لا يوجد أصناف";setTextColor(this@MainActivity.text)},lp()) else its.forEach{p->r.addView(TextView(this).apply{text="• ${p.name}   ${p.price} ${p.currency}\n  MOQ: ${p.moq}   Carton: ${p.cartonQty}";textSize=16f;setTextColor(this@MainActivity.text);setPadding(dp(14),dp(9),dp(8),dp(9));setBackgroundColor(0xFFEDF3FC.toInt())},lp(3))}}
     r.addView(button("Add Item / إضافة صنف",orange){productForm()},lp());r.addView(button("Save Excel / حفظ Excel"){exportExcel()},lp());r.addView(button("Back / رجوع",0xFF6C7A8A.toInt()){showHome()});setContentView(s)
   }
   private fun latest():File=File(File(filesDir,"exports").apply{mkdirs()},"Hassan_Sourcing_Latest.xlsx")
