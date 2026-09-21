@@ -134,6 +134,13 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(context,"hassan_sourcin
     return writableDatabase.insert("shop_items",null,v)
   }
 
+  fun updateShopItem(id:Long,name:String,price:String,currency:String,moq:String,notes:String){
+    val v=ContentValues().apply{
+      put("name",name.trim());put("price",price.trim());put("currency",currency.trim());put("moq",moq.trim());put("notes",notes.trim())
+    }
+    writableDatabase.update("shop_items",v,"id=?",arrayOf(id.toString()))
+  }
+
   fun getShopItems(shopId:Long):List<ShopItem>{
     val out=mutableListOf<ShopItem>()
     readableDatabase.rawQuery("SELECT id,shopId,name,price,currency,moq,notes FROM shop_items WHERE shopId=? ORDER BY id",arrayOf(shopId.toString())).use{c->
