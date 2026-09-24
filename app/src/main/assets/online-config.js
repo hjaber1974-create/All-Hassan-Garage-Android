@@ -1,17 +1,15 @@
-// Hassan Garage V4.1 online configuration.
-// UI is unchanged. Fill these Firebase Web App values to activate live multi-device sync.
 window.HASSAN_GARAGE_ONLINE = {
-  enabled: false,
+  enabled: true,
   firebaseVersion: "12.19.0",
   useAnonymousAuth: true,
   databasePath: "hassan-garage/v4_1/state",
   firebaseConfig: {
-    apiKey: "PASTE_FIREBASE_API_KEY",
-    authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://PASTE_DATABASE_NAME-default-rtdb.firebaseio.com",
-    projectId: "PASTE_PROJECT_ID",
-    storageBucket: "PASTE_PROJECT_ID.firebasestorage.app",
-    messagingSenderId: "PASTE_MESSAGING_SENDER_ID",
-    appId: "PASTE_APP_ID"
+    apiKey: "AIzaSyDI6EzDNhW4T4pDNTcRqRg5dO-xR6G93aM",
+    authDomain: "hassan-garage-online.firebaseapp.com",
+    databaseURL: "https://hassan-garage-online-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "hassan-garage-online",
+    storageBucket: "hassan-garage-online.firebasestorage.app",
+    messagingSenderId: "777824518461",
+    appId: "1:777824518461:web:965f805c1a897d09610554"
   }
 };
