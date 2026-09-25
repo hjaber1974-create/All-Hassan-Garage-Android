@@ -12,8 +12,8 @@ android {
         applicationId = "com.hassangarage.final"
         minSdk = 24
         targetSdk = 35
-        versionCode = 500
-        versionName = "5.0-final"
+        versionCode = 510
+        versionName = "5.1-final"
     }
 
     compileOptions {
