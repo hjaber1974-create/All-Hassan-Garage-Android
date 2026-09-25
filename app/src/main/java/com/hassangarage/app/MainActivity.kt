@@ -468,6 +468,7 @@ private class NativeSyncBridge(
         val r = normalizeForMerge(JSONObject(remote.toString()))
         val l = normalizeForMerge(JSONObject(local.toString()))
         val out = JSONObject()
+        out.put("_syncSchema", 2)
 
         val tombstones = mergeTombstones(
             r.optJSONObject("_tombstones"),
@@ -492,6 +493,17 @@ private class NativeSyncBridge(
         if (!obj.has("_tombstones") || obj.optJSONObject("_tombstones") == null) {
             obj.put("_tombstones", JSONObject())
         }
+
+        val tombstones = obj.optJSONObject("_tombstones") ?: JSONObject()
+        if (obj.optInt("_syncSchema", 0) < 2) {
+            // Old test builds could manufacture delete markers merely because
+            // one phone temporarily lacked records. Never let those erase cars.
+            tombstones.put("jobs", JSONObject())
+            tombstones.put("audit", JSONObject())
+            obj.put("_tombstones", tombstones)
+            obj.put("_syncSchema", 2)
+        }
+
         for (collection in collections) {
             if (obj.optJSONArray(collection) == null) {
                 obj.put(collection, JSONArray())
