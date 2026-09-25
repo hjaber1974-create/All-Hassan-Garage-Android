@@ -35,6 +35,13 @@ class MainActivity : ComponentActivity() {
             settings.databaseEnabled = true
             settings.allowFileAccess = true
             settings.allowContentAccess = true
+            // Hassan Garage is a local bundled web app that syncs with Firebase.
+            // Android WebView blocks file:// pages from making cross-origin network
+            // requests unless these permissions are explicitly enabled.
+            @Suppress("DEPRECATION")
+            settings.allowFileAccessFromFileURLs = true
+            @Suppress("DEPRECATION")
+            settings.allowUniversalAccessFromFileURLs = true
             settings.javaScriptCanOpenWindowsAutomatically = true
 
             webChromeClient = object : WebChromeClient() {
