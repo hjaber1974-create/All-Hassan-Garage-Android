@@ -315,6 +315,11 @@ function hgNormalizeData(d){
   if(!d||typeof d!=='object')return null;
   for(const k of HG_COLLECTIONS) if(!Array.isArray(d[k])) d[k]=defaults()[k];
   if(!d._tombstones||typeof d._tombstones!=='object')d._tombstones={};
+  if(Number(d._syncSchema||0)<2){
+    d._tombstones.jobs={};
+    d._tombstones.audit={};
+    d._syncSchema=2;
+  }
   d.jobs.forEach(j=>{if(!Array.isArray(j.changedParts))j.changedParts=[];if(!Array.isArray(j.faultReports))j.faultReports=[];if(!Array.isArray(j.laborSplits))j.laborSplits=[];if(!Array.isArray(j.partsRequests))j.partsRequests=[];if(typeof j.paid==='undefined')j.paid=0;if(typeof j.startedAt==='undefined')j.startedAt='';if(typeof j.finishedByWorkerAt==='undefined')j.finishedByWorkerAt='';if(typeof j.assignedWorkerId==='undefined')j.assignedWorkerId='';if(typeof j.assignedWorkerName==='undefined')j.assignedWorkerName='';if(typeof j.color==='undefined')j.color='';if(typeof j.vin==='undefined')j.vin='';if(typeof j.timeIn==='undefined')j.timeIn='';if(typeof j.dateOut==='undefined')j.dateOut='';if(typeof j.timeOut==='undefined')j.timeOut='';if(j.status==='delivered'||j.exited===true||j.exitedAt){j.status='delivered';j.exited=true;if(!j.exitedAt)j.exitedAt=Date.parse((j.dateOut||j.dateIn||today())+'T'+(j.timeOut||j.timeIn||'00:00'))||Date.now();}});
   d.stock.forEach(x=>{if(typeof x.minQty==='undefined')x.minQty=2});
   d.users.forEach(u=>{if(typeof u.phone==='undefined')u.phone='';u.username=String(u.username||'').trim().toLowerCase();u.password=String(u.password??'').trim();if(u.role==='employee'){u.permissions=['intake'];u.canApprove=false;}if(u.role==='mechanic'){u.permissions=['worker'];u.canApprove=false;}if(u.role==='seller'){u.permissions=['sales'];u.canApprove=false;}});
@@ -323,7 +328,7 @@ function hgNormalizeData(d){
 }
 function hgId(v,i){return v&&v.id!=null?String(v.id):'idx-'+i+'-'+JSON.stringify(v)}
 function hgComparable(v){return JSON.stringify(v,(k,val)=>(k==='_updatedAt'||k==='_deviceId')?undefined:val)}
-function hgJobRank(s){return s==='delivered'?3:s==='ready'?2:1}
+function hgJobRank(j){if(j?.exited===true||j?.exitedAt)return 4;return j?.status==='delivered'?3:j?.status==='ready'?2:1}
 function hgMergeTombstones(a,b){
   const out={}; const cols=new Set([...Object.keys(a||{}),...Object.keys(b||{})]);
   cols.forEach(col=>{out[col]={};const ids=new Set([...Object.keys((a||{})[col]||{}),...Object.keys((b||{})[col]||{})]);ids.forEach(id=>{out[col][id]=Math.max(Number((a||{})[col]?.[id]||0),Number((b||{})[col]?.[id]||0))})});
@@ -332,7 +337,7 @@ function hgMergeTombstones(a,b){
 function hgMergeVersioned(remote,local,preferLocal=true){
   remote=hgNormalizeData(remote||defaults())||defaults();
   local=hgNormalizeData(local||defaults())||defaults();
-  const out={_tombstones:hgMergeTombstones(remote._tombstones,local._tombstones)};
+  const out={_syncSchema:2,_tombstones:hgMergeTombstones(remote._tombstones,local._tombstones)};
   for(const col of HG_COLLECTIONS){
     const m=new Map();
     (remote[col]||[]).forEach((v,i)=>m.set(hgId(v,i),hgDeep(v)));
@@ -342,7 +347,7 @@ function hgMergeVersioned(remote,local,preferLocal=true){
       const a=Number(old._updatedAt||0),b=Number(v._updatedAt||0);
       let choose=b>a;
       if(a===b){
-        if(col==='jobs'&&hgJobRank(v.status)!==hgJobRank(old.status))choose=hgJobRank(v.status)>hgJobRank(old.status);
+        if(col==='jobs'&&hgJobRank(v)!==hgJobRank(old))choose=hgJobRank(v)>hgJobRank(old);
         else choose=preferLocal;
       }
       if(choose)m.set(id,hgDeep(v));
@@ -350,7 +355,11 @@ function hgMergeVersioned(remote,local,preferLocal=true){
     out[col]=[];
     for(const [id,v] of m){
       const deletedAt=Number(out._tombstones?.[col]?.[id]||0);
-      if(deletedAt<=0)out[col].push(v);
+      if(col==='audit'||deletedAt<=0)out[col].push(v);
+    }
+    if(col==='audit'){
+      out[col].sort((a,b)=>String(b.time||'').localeCompare(String(a.time||'')));
+      out[col]=out[col].slice(0,500);
     }
   }
   return hgNormalizeData(out);
@@ -366,15 +375,13 @@ function hgStampChanges(){
     const newArr=Array.isArray(data[col])?data[col]:[];
     const oldMap=new Map(oldArr.map((v,i)=>[hgId(v,i),v]));
     const newMap=new Map(newArr.map((v,i)=>[hgId(v,i),v]));
-    for(const [id,old] of oldMap){
-      if(!newMap.has(id))data._tombstones[col][id]=Math.max(Number(data._tombstones[col][id]||0),now);
-    }
+    // Missing locally is not a deletion. Hard deletes are explicit only.
     newArr.forEach((v,i)=>{
       const id=hgId(v,i),old=oldMap.get(id);
       if(!old||hgComparable(old)!==hgComparable(v)){
         v._updatedAt=now;
         v._deviceId=device;
-        if(data._tombstones[col][id]&&Number(data._tombstones[col][id])<=now)delete data._tombstones[col][id];
+        // Explicit tombstones are permanent; IDs are never reused.
       }
     });
   }
@@ -387,8 +394,7 @@ function hgSaveLocal(){
   let nativeSaved=false,localSaved=false;
   try{
     if(window.AndroidSync&&typeof AndroidSync.saveLocalBackup==='function'){
-      AndroidSync.saveLocalBackup(json);
-      nativeSaved=true;
+      nativeSaved=(AndroidSync.saveLocalBackup(json)!==false);
     }
   }catch(e){console.error('Android backup save failed',e)}
   try{
@@ -447,18 +453,19 @@ async function hgInitOnline(){
   try{
     if(window.AndroidSync&&typeof AndroidSync.syncState==='function'){
       try{
-        const b=AndroidSync.getLocalBackup?.()||'';
+        const b=(typeof AndroidSync.getLocalBackup==='function')?(AndroidSync.getLocalBackup()||''):'';
         if(b){
           const backup=JSON.parse(b);
           data=hgMergeVersioned(backup,data,true);
-          localStorage.setItem(KEY,JSON.stringify(data));
+          try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}
           hgLastSnapshot=hgDeep(data);
         }
       }catch(e){console.error('Backup restore merge failed',e)}
+      window.hgNativeStatus=function(status){console.log('Hassan Garage sync:',status)};
       hgOnlineReady=true;
       hgQueuePush();
       clearInterval(hgPollTimer);
-      hgPollTimer=setInterval(()=>{try{AndroidSync.pullState()}catch(e){}},3000);
+      hgPollTimer=setInterval(()=>{try{AndroidSync.pullState()}catch(e){}},30000);
       return;
     }
   }catch(e){console.error('Native sync init failed',e)}
@@ -773,7 +780,7 @@ function renderStock(){
 }
 if($('stockSearch'))$('stockSearch').oninput=renderStock;
 
-window.deleteStock=id=>{if(!isAdmin())return;if(confirm(tr('deletePartConfirm'))){const s=data.stock.find(x=>String(x.id)===String(id));data.stock=data.stock.filter(s=>String(s.id)!==String(id));log('STOCK_DELETED',s?.name||'');persist()}};
+window.deleteStock=id=>{if(!isAdmin())return;if(confirm(tr('deletePartConfirm'))){const item=data.stock.find(x=>String(x.id)===String(id));const key=String(id);if(!data._tombstones||typeof data._tombstones!=='object')data._tombstones={};if(!data._tombstones.stock||typeof data._tombstones.stock!=='object')data._tombstones.stock={};data._tombstones.stock[key]=Date.now();data.stock=data.stock.filter(x=>String(x.id)!==key);log('STOCK_DELETED',item?.name||'');persist()}};
 
 
 let stockAddBusy=false;
@@ -1150,6 +1157,7 @@ window.adminDeleteExitedVehicle=function(id){
   const stamp=Date.now();
   if(!data._tombstones||typeof data._tombstones!=='object')data._tombstones={};
   if(!data._tombstones.jobs||typeof data._tombstones.jobs!=='object')data._tombstones.jobs={};
+  data._syncSchema=2;
   data._tombstones.jobs[idKey]=stamp;
 
   data.jobs=data.jobs.filter(x=>String(x.id)!==idKey);
