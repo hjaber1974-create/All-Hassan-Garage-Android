@@ -9,11 +9,11 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.hassangarage.v4"
+        applicationId = "com.hassangarage.final"
         minSdk = 24
         targetSdk = 35
-        versionCode = 41
-        versionName = "4.1"
+        versionCode = 100
+        versionName = "4.1-final"
     }
 
     compileOptions {
