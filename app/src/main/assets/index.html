@@ -291,137 +291,163 @@ const t={
  }
 };
 const tr=k=>t[lang][k]||k;
-let hgOnlineRef=null,hgApplyingRemote=false,hgOnlineReady=false,hgPushTimer=null,hgSyncing=false;
+let hgOnlineRef=null,hgApplyingRemote=false,hgOnlineReady=false,hgPushTimer=null;
 const HG_DIRTY_KEY='hassanGarageOnlineDirty';
-const HG_BACKUP_KEY='hassanGarageAutoBackup';
-const HG_BACKUP_PREV_KEY='hassanGarageAutoBackupPrev';
 const HG_DEVICE_KEY='hassanGarageDeviceId';
+const HG_COLLECTIONS=['jobs','stock','sales','bookings','codes','audit','users'];
 let hgLocalDirty=localStorage.getItem(HG_DIRTY_KEY)==='1';
+let hgLastSnapshot=null;
+let hgPollTimer=null;
 
 function hgOnlineCfg(){return window.HASSAN_GARAGE_ONLINE||{enabled:false}}
-function hgLoadScript(src){return new Promise((resolve,reject)=>{const x=document.createElement('script');x.src=src;x.onload=resolve;x.onerror=reject;document.head.appendChild(x)})}
+function hgDeep(v){return JSON.parse(JSON.stringify(v))}
 function hgDeviceId(){
-  let id='';
-  try{id=localStorage.getItem(HG_DEVICE_KEY)||''}catch(e){}
-  if(!id){
-    id='dev-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
-    try{localStorage.setItem(HG_DEVICE_KEY,id)}catch(e){}
-  }
+  try{
+    if(window.AndroidSync&&typeof AndroidSync.getDeviceId==='function'){
+      const id=AndroidSync.getDeviceId(); if(id)return id;
+    }
+  }catch(e){}
+  let id=localStorage.getItem(HG_DEVICE_KEY)||'';
+  if(!id){id='web-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);localStorage.setItem(HG_DEVICE_KEY,id)}
   return id;
 }
 function hgNormalizeData(d){
   if(!d||typeof d!=='object')return null;
-  for(const k of ['jobs','stock','sales','bookings','codes','audit','users']) if(!Array.isArray(d[k])) d[k]=defaults()[k];
+  for(const k of HG_COLLECTIONS) if(!Array.isArray(d[k])) d[k]=defaults()[k];
+  if(!d._tombstones||typeof d._tombstones!=='object')d._tombstones={};
   d.jobs.forEach(j=>{if(!Array.isArray(j.changedParts))j.changedParts=[];if(!Array.isArray(j.faultReports))j.faultReports=[];if(!Array.isArray(j.laborSplits))j.laborSplits=[];if(!Array.isArray(j.partsRequests))j.partsRequests=[];if(typeof j.paid==='undefined')j.paid=0;if(typeof j.startedAt==='undefined')j.startedAt='';if(typeof j.finishedByWorkerAt==='undefined')j.finishedByWorkerAt='';if(typeof j.assignedWorkerId==='undefined')j.assignedWorkerId='';if(typeof j.assignedWorkerName==='undefined')j.assignedWorkerName='';if(typeof j.color==='undefined')j.color='';if(typeof j.vin==='undefined')j.vin='';if(typeof j.timeIn==='undefined')j.timeIn='';if(typeof j.dateOut==='undefined')j.dateOut='';if(typeof j.timeOut==='undefined')j.timeOut='';});
   d.stock.forEach(x=>{if(typeof x.minQty==='undefined')x.minQty=2});
   d.users.forEach(u=>{if(typeof u.phone==='undefined')u.phone='';u.username=String(u.username||'').trim().toLowerCase();u.password=String(u.password??'').trim();if(u.role==='employee'){u.permissions=['intake'];u.canApprove=false;}if(u.role==='mechanic'){u.permissions=['worker'];u.canApprove=false;}if(u.role==='seller'){u.permissions=['sales'];u.canApprove=false;}});
   d.sales.forEach(x=>{if(!Array.isArray(x.lines))x.lines=[]});
   return d;
 }
-function hgBackupLocal(){
-  try{
-    const current=localStorage.getItem(HG_BACKUP_KEY);
-    if(current)localStorage.setItem(HG_BACKUP_PREV_KEY,current);
-    localStorage.setItem(HG_BACKUP_KEY,JSON.stringify({time:Date.now(),device:hgDeviceId(),data}));
-  }catch(e){console.error('HG local backup failed',e)}
-}
-function hgMarkDirty(){
-  if(hgApplyingRemote)return;
-  hgLocalDirty=true;
-  try{localStorage.setItem(HG_DIRTY_KEY,'1')}catch(e){}
-}
-function hgClearDirty(){
-  hgLocalDirty=false;
-  try{localStorage.removeItem(HG_DIRTY_KEY)}catch(e){}
-}
 function hgId(v,i){return v&&v.id!=null?String(v.id):'idx-'+i+'-'+JSON.stringify(v)}
-function hgMergeArray(remoteArr,localArr,preferLocal){
-  const out=new Map();
-  (Array.isArray(remoteArr)?remoteArr:[]).forEach((v,i)=>out.set(hgId(v,i),v));
-  (Array.isArray(localArr)?localArr:[]).forEach((v,i)=>{
-    const k=hgId(v,i);
-    if(preferLocal||!out.has(k))out.set(k,v);
-  });
-  return Array.from(out.values());
+function hgComparable(v){return JSON.stringify(v,(k,val)=>(k==='_updatedAt'||k==='_deviceId')?undefined:val)}
+function hgJobRank(s){return s==='delivered'?3:s==='ready'?2:1}
+function hgMergeTombstones(a,b){
+  const out={}; const cols=new Set([...Object.keys(a||{}),...Object.keys(b||{})]);
+  cols.forEach(col=>{out[col]={};const ids=new Set([...Object.keys((a||{})[col]||{}),...Object.keys((b||{})[col]||{})]);ids.forEach(id=>{out[col][id]=Math.max(Number((a||{})[col]?.[id]||0),Number((b||{})[col]?.[id]||0))})});
+  return out;
 }
-function hgMergeData(remote,local,preferLocal=true){
+function hgMergeVersioned(remote,local,preferLocal=true){
   remote=hgNormalizeData(remote||defaults())||defaults();
   local=hgNormalizeData(local||defaults())||defaults();
-  const merged={};
-  for(const k of ['jobs','stock','sales','bookings','codes','audit','users']){
-    merged[k]=hgMergeArray(remote[k],local[k],preferLocal);
+  const out={_tombstones:hgMergeTombstones(remote._tombstones,local._tombstones)};
+  for(const col of HG_COLLECTIONS){
+    const m=new Map();
+    (remote[col]||[]).forEach((v,i)=>m.set(hgId(v,i),hgDeep(v)));
+    (local[col]||[]).forEach((v,i)=>{
+      const id=hgId(v,i),old=m.get(id);
+      if(!old){m.set(id,hgDeep(v));return}
+      const a=Number(old._updatedAt||0),b=Number(v._updatedAt||0);
+      let choose=b>a;
+      if(a===b){
+        if(col==='jobs'&&hgJobRank(v.status)!==hgJobRank(old.status))choose=hgJobRank(v.status)>hgJobRank(old.status);
+        else choose=preferLocal;
+      }
+      if(choose)m.set(id,hgDeep(v));
+    });
+    out[col]=[];
+    for(const [id,v] of m){
+      const deletedAt=Number(out._tombstones?.[col]?.[id]||0);
+      if(deletedAt<=Number(v._updatedAt||0))out[col].push(v);
+    }
   }
-  return hgNormalizeData(merged);
+  return hgNormalizeData(out);
 }
-function hgApplyRemote(remote){
-  const merged=hgMergeData(remote,data,false);
-  if(!merged)return;
+function hgStampChanges(){
+  if(hgApplyingRemote)return;
+  const now=Date.now(),device=hgDeviceId();
+  if(!data._tombstones||typeof data._tombstones!=='object')data._tombstones={};
+  const prev=hgLastSnapshot||hgDeep(data);
+  for(const col of HG_COLLECTIONS){
+    if(!data._tombstones[col])data._tombstones[col]={};
+    const oldArr=Array.isArray(prev[col])?prev[col]:[];
+    const newArr=Array.isArray(data[col])?data[col]:[];
+    const oldMap=new Map(oldArr.map((v,i)=>[hgId(v,i),v]));
+    const newMap=new Map(newArr.map((v,i)=>[hgId(v,i),v]));
+    for(const [id,old] of oldMap){
+      if(!newMap.has(id))data._tombstones[col][id]=Math.max(Number(data._tombstones[col][id]||0),now);
+    }
+    newArr.forEach((v,i)=>{
+      const id=hgId(v,i),old=oldMap.get(id);
+      if(!old||hgComparable(old)!==hgComparable(v)){
+        v._updatedAt=now;
+        v._deviceId=device;
+        if(data._tombstones[col][id]&&Number(data._tombstones[col][id])<=now)delete data._tombstones[col][id];
+      }
+    });
+  }
+}
+function hgMarkDirty(){hgLocalDirty=true;try{localStorage.setItem(HG_DIRTY_KEY,'1')}catch(e){}}
+function hgClearDirty(){hgLocalDirty=false;try{localStorage.removeItem(HG_DIRTY_KEY)}catch(e){}}
+function hgSaveLocal(){
+  hgStampChanges();
+  localStorage.setItem(KEY,JSON.stringify(data));
+  try{if(window.AndroidSync&&typeof AndroidSync.saveLocalBackup==='function')AndroidSync.saveLocalBackup(JSON.stringify(data))}catch(e){}
+  hgLastSnapshot=hgDeep(data);
+}
+function hgApplyAuthoritative(remote){
+  const normalized=hgNormalizeData(remote);
+  if(!normalized)return;
   hgApplyingRemote=true;
-  data=merged;
-  try{localStorage.setItem(KEY,JSON.stringify(data));hgBackupLocal()}catch(e){}
+  const uid=currentUser?.id;
+  data=normalized;
+  try{localStorage.setItem(KEY,JSON.stringify(data));if(window.AndroidSync&&typeof AndroidSync.saveLocalBackup==='function')AndroidSync.saveLocalBackup(JSON.stringify(data))}catch(e){}
+  if(uid){const fresh=data.users.find(u=>String(u.id)===String(uid));if(fresh)currentUser=fresh}
+  hgLastSnapshot=hgDeep(data);
   renderAll();
   hgApplyingRemote=false;
 }
-async function hgBackupRemote(remote){
-  if(!window.firebase||!remote)return;
+window.hgNativeSynced=function(json){
   try{
-    const cfg=hgOnlineCfg();
-    const root=(cfg.databasePath||'hassan-garage/v4_1/state').replace(/\/state$/,'');
-    await firebase.database().ref(root+'/backup_last').set({
-      savedAt:firebase.database.ServerValue.TIMESTAMP,
-      deviceId:hgDeviceId(),
-      state:remote
-    });
-  }catch(e){console.error('HG remote backup failed',e)}
-}
-async function hgPushMerged(){
-  if(!hgOnlineReady||!hgOnlineRef||hgApplyingRemote||hgSyncing)return false;
-  hgSyncing=true;
+    const remote=JSON.parse(json);
+    hgClearDirty();
+    hgApplyAuthoritative(remote);
+  }catch(e){console.error('Native sync response error',e)}
+};
+window.hgNativeRemote=function(json){
   try{
-    hgBackupLocal();
-    const localCopy=JSON.parse(JSON.stringify(data));
-    let backupDone=false;
-    const result=await hgOnlineRef.transaction(remote=>{
-      if(remote&&!backupDone){backupDone=true;setTimeout(()=>hgBackupRemote(remote),0)}
-      return hgMergeData(remote,localCopy,true);
-    },undefined,false);
-    if(result&&result.committed&&result.snapshot){
-      const finalData=hgNormalizeData(result.snapshot.val());
-      if(finalData){
-        hgApplyingRemote=true;
-        data=finalData;
-        localStorage.setItem(KEY,JSON.stringify(data));
-        hgBackupLocal();
-        renderAll();
-        hgApplyingRemote=false;
-      }
-      hgClearDirty();
-      return true;
-    }
-    return false;
-  }catch(e){
-    console.error('HG sync write failed',e);
-    hgMarkDirty();
-    return false;
-  }finally{
-    hgSyncing=false;
-  }
-}
+    const remote=JSON.parse(json);
+    if(hgLocalDirty){hgQueuePush();return}
+    hgApplyAuthoritative(remote);
+  }catch(e){console.error('Native remote response error',e)}
+};
 function hgQueuePush(){
   if(hgApplyingRemote)return;
-  hgBackupLocal();
+  try{hgSaveLocal()}catch(e){console.error('HG local save failed',e);return}
   hgMarkDirty();
+  if(window.AndroidSync&&typeof AndroidSync.syncState==='function'){
+    try{AndroidSync.syncState(JSON.stringify(data));hgOnlineReady=true}catch(e){console.error('Android sync failed',e)}
+    return;
+  }
   if(!hgOnlineReady||!hgOnlineRef)return;
   clearTimeout(hgPushTimer);
-  hgPushTimer=setTimeout(()=>hgPushMerged(),100);
+  hgPushTimer=setTimeout(()=>hgOnlineRef.set(data).then(()=>hgClearDirty()).catch(e=>console.error('HG sync write failed',e)),120);
 }
-function persist(){
-  hgBackupLocal();
-  localStorage.setItem(KEY,JSON.stringify(data));
-  renderAll();
-  hgQueuePush();
-}
+function persist(){hgQueuePush();renderAll()}
+function hgLoadScript(src){return new Promise((resolve,reject)=>{const x=document.createElement('script');x.src=src;x.onload=resolve;x.onerror=reject;document.head.appendChild(x)})}
 async function hgInitOnline(){
+  hgLastSnapshot=hgDeep(data);
+  try{
+    if(window.AndroidSync&&typeof AndroidSync.syncState==='function'){
+      try{
+        const b=AndroidSync.getLocalBackup?.()||'';
+        if(b){
+          const backup=JSON.parse(b);
+          data=hgMergeVersioned(backup,data,true);
+          localStorage.setItem(KEY,JSON.stringify(data));
+          hgLastSnapshot=hgDeep(data);
+        }
+      }catch(e){console.error('Backup restore merge failed',e)}
+      hgOnlineReady=true;
+      hgQueuePush();
+      clearInterval(hgPollTimer);
+      hgPollTimer=setInterval(()=>{try{AndroidSync.pullState()}catch(e){}},3000);
+      return;
+    }
+  }catch(e){console.error('Native sync init failed',e)}
+
   const cfg=hgOnlineCfg();
   if(!cfg.enabled||!cfg.firebaseConfig||!cfg.firebaseConfig.databaseURL)return;
   try{
@@ -434,20 +460,11 @@ async function hgInitOnline(){
     if(cfg.useAnonymousAuth!==false)await firebase.auth().signInAnonymously();
     hgOnlineRef=firebase.database().ref(cfg.databasePath||'hassan-garage/v4_1/state');
     hgOnlineReady=true;
-
-    // Never overwrite the phone with an older cloud snapshot.
-    // First merge both sides and write the merged result back to Firebase.
-    await hgPushMerged();
-
-    hgOnlineRef.on('value',snap=>{
-      const remote=snap.val();
-      if(!remote)return;
-      if(hgLocalDirty){
-        hgQueuePush();
-        return;
-      }
-      hgApplyRemote(remote);
-    });
+    const snap=await hgOnlineRef.once('value');
+    const remote=snap.val();
+    if(remote){data=hgMergeVersioned(remote,data,true);hgSaveLocal()}
+    hgQueuePush();
+    hgOnlineRef.on('value',snap=>{const r=snap.val();if(!r)return;if(hgLocalDirty)return;hgApplyAuthoritative(r)});
   }catch(e){console.error('Hassan Garage online init failed',e)}
 }
 function log(action,detail=''){data.audit.unshift({id:Date.now()+Math.random(),time:nowIso(),user:currentUser?.username||'customer',name:currentUser?.name||tr('customerRole'),action,detail});data.audit=data.audit.slice(0,500);}
@@ -514,7 +531,7 @@ function showApp(){
 }
 function hardLogout(ev){
  if(ev){ev.preventDefault();ev.stopPropagation();}
- try{log('LOGOUT');localStorage.setItem(KEY,JSON.stringify(data));hgQueuePush();}catch(e){}
+ try{log('LOGOUT');hgQueuePush();}catch(e){}
  try{sessionStorage.removeItem('hgUser')}catch(e){}
  currentUser=null;currentId=null;activeCustomerCode=null;lastListTab='jobs';
  const app=$('appShell'),auth=$('authScreen');
@@ -579,8 +596,6 @@ function showHgToast(msg){
 
 function saveGarageDataSafe(){
   try{
-    hgBackupLocal();
-    localStorage.setItem(KEY,JSON.stringify(data));
     hgQueuePush();
     return true;
   }catch(e){
@@ -667,14 +682,15 @@ $('saveIntake').onclick=()=>{
   log('DIRECT_INTAKE',`${j.customer} ${j.plate}`);
   if(workerId)log('WORKER_ASSIGNED',`${j.customer} ${j.plate} · ${j.assignedWorkerName}`);
 
+  // One tap = save locally + backup + queue online before leaving this form.
+  const savedOk=saveGarageDataSafe();
+
   clearIntakeFormAfterSave();
 
   renderInsideCars();
   switchTab('inside');
   renderInsideCars();
   renderDashboard();
-
-  const savedOk=saveGarageDataSafe();
   showHgToast(
     savedOk
       ? (lang==='ar'?'تم دخول السيارة ✓':'Vehicle entered ✓')
@@ -788,7 +804,7 @@ window.addStockNow=function(ev){
     log('STOCK_ADDED',name);
   }
 
-  try{localStorage.setItem(KEY,JSON.stringify(data));hgQueuePush()}catch(e){console.error(e)}
+  try{persist()}catch(e){console.error(e)}
 
   // Clear the Add Inventory page completely.
   if($('stockName'))$('stockName').value='';
@@ -1143,7 +1159,7 @@ window.exitVehicleNow=function(ev){
   j.timeOut=timeNow();
 
   try{log('VEHICLE_EXITED',`${j.customer||''} ${j.plate||''}`)}catch(e){}
-  try{localStorage.setItem(KEY,JSON.stringify(data));hgQueuePush()}catch(e){console.error(e)}
+  try{persist()}catch(e){console.error(e)}
 
   // Repaint both lists before navigating.
   try{renderInsideCars()}catch(e){}
