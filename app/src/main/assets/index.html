@@ -350,7 +350,7 @@ function hgMergeVersioned(remote,local,preferLocal=true){
     out[col]=[];
     for(const [id,v] of m){
       const deletedAt=Number(out._tombstones?.[col]?.[id]||0);
-      if(deletedAt<=Number(v._updatedAt||0))out[col].push(v);
+      if(deletedAt<=0)out[col].push(v);
     }
   }
   return hgNormalizeData(out);
@@ -383,9 +383,23 @@ function hgMarkDirty(){hgLocalDirty=true;try{localStorage.setItem(HG_DIRTY_KEY,'
 function hgClearDirty(){hgLocalDirty=false;try{localStorage.removeItem(HG_DIRTY_KEY)}catch(e){}}
 function hgSaveLocal(){
   hgStampChanges();
-  localStorage.setItem(KEY,JSON.stringify(data));
-  try{if(window.AndroidSync&&typeof AndroidSync.saveLocalBackup==='function')AndroidSync.saveLocalBackup(JSON.stringify(data))}catch(e){}
+  const json=JSON.stringify(data);
+  let nativeSaved=false,localSaved=false;
+  try{
+    if(window.AndroidSync&&typeof AndroidSync.saveLocalBackup==='function'){
+      AndroidSync.saveLocalBackup(json);
+      nativeSaved=true;
+    }
+  }catch(e){console.error('Android backup save failed',e)}
+  try{
+    localStorage.setItem(KEY,json);
+    localSaved=true;
+  }catch(e){
+    console.error('Browser storage full; Android backup remains active',e);
+  }
   hgLastSnapshot=hgDeep(data);
+  if(!nativeSaved&&!localSaved)throw new Error('No local storage available');
+  return true;
 }
 function hgApplyAuthoritative(remote){
   const normalized=hgNormalizeData(remote);
@@ -393,7 +407,8 @@ function hgApplyAuthoritative(remote){
   hgApplyingRemote=true;
   const uid=currentUser?.id;
   data=normalized;
-  try{localStorage.setItem(KEY,JSON.stringify(data));if(window.AndroidSync&&typeof AndroidSync.saveLocalBackup==='function')AndroidSync.saveLocalBackup(JSON.stringify(data))}catch(e){}
+  try{if(window.AndroidSync&&typeof AndroidSync.saveLocalBackup==='function')AndroidSync.saveLocalBackup(JSON.stringify(data))}catch(e){console.error('Android backup apply failed',e)}
+  try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){console.error('Browser storage full while applying remote data',e)}
   if(uid){const fresh=data.users.find(u=>String(u.id)===String(uid));if(fresh)currentUser=fresh}
   hgLastSnapshot=hgDeep(data);
   renderAll();
@@ -1113,10 +1128,51 @@ function renderExitedCars(){
       <span class="pill">${tr('delivered')}</span>
     </div>
     <div class="inside-car-actions">
-      ${isAdmin()?`<button class="btn secondary small" onclick="openEditor(${j.id},'exited')">${tr('openFile')}</button>`:''}
+      ${isAdmin()?`<button class="btn secondary small" onclick="openEditor(${j.id},'exited')">${tr('openFile')}</button> <button class="btn danger small" onclick="event.stopPropagation();adminDeleteExitedVehicle(${JSON.stringify(j.id)})">${lang==='ar'?'حذف نهائي':'Delete permanently'}</button>`:''}
     </div>
   </div>`).join('');
 }
+
+window.adminDeleteExitedVehicle=function(id){
+  if(!isAdmin())return false;
+  const j=data.jobs.find(x=>String(x.id)===String(id));
+  if(!j)return false;
+  if(!(j.status==='delivered'||j.exited===true||j.exitedAt)){
+    alert(lang==='ar'?'الحذف النهائي متاح من قائمة الخروج فقط.':'Permanent delete is available from the Exit list only.');
+    return false;
+  }
+  const msg=lang==='ar'
+    ? 'حذف نهائي؟ السيارة ستنحذف من النظام ومن كل الأجهزة ولا يمكن إرجاعها.'
+    : 'Delete permanently? This vehicle will be removed from the system and all devices and cannot be restored.';
+  if(!confirm(msg))return false;
+
+  const idKey=String(j.id);
+  const stamp=Date.now();
+  if(!data._tombstones||typeof data._tombstones!=='object')data._tombstones={};
+  if(!data._tombstones.jobs||typeof data._tombstones.jobs!=='object')data._tombstones.jobs={};
+  data._tombstones.jobs[idKey]=stamp;
+
+  data.jobs=data.jobs.filter(x=>String(x.id)!==idKey);
+  log('VEHICLE_DELETED_PERMANENTLY',`${j.customer||''} ${j.plate||''}`);
+
+  try{
+    hgSaveLocal();
+    hgMarkDirty();
+    if(window.AndroidSync&&typeof AndroidSync.syncState==='function'){
+      AndroidSync.syncState(JSON.stringify(data));
+    }else{
+      hgQueuePush();
+    }
+  }catch(e){
+    console.error('Permanent vehicle delete save failed',e);
+    alert(lang==='ar'?'تعذر حفظ الحذف. السيارة لم تُحذف بأمان.':'Could not save the deletion safely.');
+    return false;
+  }
+
+  renderAll();
+  showHgToast(lang==='ar'?'تم حذف السيارة نهائيًا ✓':'Vehicle permanently deleted ✓');
+  return false;
+};
 
 function renderDashboard(){if(!isAdmin())return;const d=today();const garageTotal=data.jobs.filter(j=>(j.dateIn||'')===d).reduce((sum,j)=>sum+jobTotal(j),0);const stockSalesTotal=data.sales.filter(s=>s.date===d).reduce((sum,s)=>sum+Number(s.total||0),0);const todayTotal=garageTotal+stockSalesTotal;$('statPending').textContent=data.bookings.filter(b=>b.status==='pending').length;$('statOpen').textContent=data.jobs.filter(j=>j.status!=='delivered'&&j.exited!==true&&!j.exitedAt).length;$('statStock').textContent=data.stock.length;const low=data.stock.filter(x=>Number(x.qty)<=Number(x.minQty||0)).length;$('statLowStock').textContent=low?`${tr('lowStock')}: ${low}`:'';$('statTodayTotal').textContent=money(todayTotal);$('statTodayDate').textContent=displayDay(d);renderAudit()}
 
@@ -1177,19 +1233,19 @@ window.exitVehicleNow=function(ev){
       }
     }catch(e){console.error('Exit online queue failed',e)}
 
-    renderInsideCars();
-    renderExitedCars();
-    renderDashboard();
-    renderJobs();
-    renderArchive();
-    renderReports();
+    try{renderInsideCars()}catch(e){console.error(e)}
+    try{renderExitedCars()}catch(e){console.error(e)}
+    try{renderDashboard()}catch(e){console.error(e)}
+    try{renderJobs()}catch(e){console.error(e)}
+    try{renderArchive()}catch(e){console.error(e)}
+    try{renderReports()}catch(e){console.error(e)}
 
     currentId=null;
-    switchTab('exited');
-    showHgToast(lang==='ar'?'تم خروج السيارة وحفظها في قائمة الخروج ✓':'Vehicle exited and saved in Exit list ✓');
+    try{switchTab('exited')}catch(e){console.error(e)}
+    try{showHgToast(lang==='ar'?'تم خروج السيارة وحفظها في قائمة الخروج ✓':'Vehicle exited and saved in Exit list ✓')}catch(e){}
   }catch(e){
-    console.error('Vehicle exit failed',e);
-    alert(lang==='ar'?'صار خطأ أثناء خروج السيارة. لم يتم حذف السيارة.':'Exit failed. The vehicle was not deleted.');
+    console.error('Vehicle exit save failed',e);
+    alert(lang==='ar'?'تعذر حفظ خروج السيارة. لم يتم حذف أي بيانات.':'Could not save vehicle exit. No data was deleted.');
   }finally{
     setTimeout(()=>{exitBusy=false;if(exitBtn)exitBtn.disabled=false},500);
   }
