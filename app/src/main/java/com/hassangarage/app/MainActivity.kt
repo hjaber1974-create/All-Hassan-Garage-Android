@@ -14,14 +14,23 @@ import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.MutableData
+import com.google.firebase.database.Transaction
+import com.google.firebase.database.ValueEventListener
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
-import java.net.HttpURLConnection
-import java.net.URL
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
-import java.util.concurrent.Executors
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.LinkedHashMap
+import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivity : ComponentActivity() {
@@ -147,24 +156,42 @@ private class NativeSyncBridge(
     private val context: Context,
     private val webView: WebView
 ) {
-    private val executor = Executors.newSingleThreadExecutor()
-    private val syncing = AtomicBoolean(false)
-    @Volatile private var pendingJson: String? = null
-    @Volatile private var idToken: String? = null
-
     private val prefs = context.getSharedPreferences("hassan_garage_sync", Context.MODE_PRIVATE)
+
     private val apiKey = "AIzaSyDI6EzDNhW4T4pDNTcRqRg5dO-xR6G93aM"
-    private val databaseUrl = "https://hassan-garage-online-default-rtdb.europe-west1.firebasedatabase.app"
-    private val statePath = "hassan-garage/v4_1/state"
-    private val backupPath = "hassan-garage/v4_1/backup_last"
-    private val collections = listOf("jobs", "stock", "sales", "bookings", "codes", "audit", "users")
+    private val appId = "1:777824518461:web:965f805c1a897d09610554"
+    private val projectId = "hassan-garage-online"
+    private val databaseUrl =
+        "https://hassan-garage-online-default-rtdb.europe-west1.firebasedatabase.app"
+
+    private val statePath = "hassan-garage/v4_1/state_json"
+    private val legacyPath = "hassan-garage/v4_1/state"
+
+    private val collections =
+        listOf("jobs", "stock", "sales", "bookings", "codes", "audit", "users")
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var database: FirebaseDatabase
+    private lateinit var stateRef: DatabaseReference
+    private lateinit var legacyRef: DatabaseReference
+
+    @Volatile private var ready = false
+    @Volatile private var pendingJson: String? = null
+    private val syncing = AtomicBoolean(false)
+    private var listener: ValueEventListener? = null
+
+    init {
+        initializeFirebase()
+    }
 
     @JavascriptInterface
     fun getDeviceId(): String {
         var id = prefs.getString("device_id", null)
         if (id.isNullOrBlank()) {
             id = "android-" + System.currentTimeMillis().toString(36) + "-" +
-                java.lang.Long.toString(java.lang.Double.doubleToLongBits(Math.random()), 36).takeLast(8)
+                java.lang.Long.toString(
+                    java.lang.Double.doubleToLongBits(Math.random()), 36
+                ).takeLast(8)
             prefs.edit().putString("device_id", id).apply()
         }
         return id
@@ -181,8 +208,13 @@ private class NativeSyncBridge(
     }
 
     @JavascriptInterface
-    fun saveLocalBackup(json: String) {
-        saveBackupFiles(json)
+    fun saveLocalBackup(json: String): Boolean {
+        return saveBackupFiles(json)
+    }
+
+    @JavascriptInterface
+    fun getSyncStatus(): String {
+        return prefs.getString("sync_status", "STARTING") ?: "STARTING"
     }
 
     @JavascriptInterface
@@ -194,104 +226,284 @@ private class NativeSyncBridge(
 
     @JavascriptInterface
     fun pullState() {
-        executor.execute {
-            try {
-                val remote = getRemoteState()
-                if (remote != null) callback("hgNativeRemote", remote.toString())
-            } catch (_: Exception) {
-                // Keep working offline. Next poll/save will retry.
+        if (!ready) return
+        stateRef.get()
+            .addOnSuccessListener { snap ->
+                val text = snap.getValue(String::class.java)
+                if (!text.isNullOrBlank()) callback("hgNativeRemote", text)
             }
-        }
+            .addOnFailureListener { e ->
+                setStatus("PULL_ERROR: ${e.message ?: "unknown"}")
+            }
     }
 
     fun shutdown() {
-        executor.shutdownNow()
+        listener?.let {
+            if (::stateRef.isInitialized) stateRef.removeEventListener(it)
+        }
+        listener = null
     }
 
-    private fun saveBackupFiles(json: String) {
+    private fun initializeFirebase() {
         try {
+            val options = FirebaseOptions.Builder()
+                .setApiKey(apiKey)
+                .setApplicationId(appId)
+                .setProjectId(projectId)
+                .setDatabaseUrl(databaseUrl)
+                .build()
+
+            val firebaseApp = FirebaseApp.getApps(context)
+                .firstOrNull { it.name == FIREBASE_APP_NAME }
+                ?: FirebaseApp.initializeApp(context, options, FIREBASE_APP_NAME)
+                ?: throw IllegalStateException("Firebase initialization failed")
+
+            auth = FirebaseAuth.getInstance(firebaseApp)
+            database = FirebaseDatabase.getInstance(firebaseApp)
+
+            try {
+                database.setPersistenceCacheSizeBytes(50L * 1024L * 1024L)
+                database.setPersistenceEnabled(true)
+            } catch (_: Exception) {
+            }
+
+            stateRef = database.getReference(statePath)
+            legacyRef = database.getReference(legacyPath)
+
+            setStatus("AUTHENTICATING")
+            auth.signInAnonymously()
+                .addOnSuccessListener {
+                    setStatus("AUTH_OK")
+                    prepareCanonicalState()
+                }
+                .addOnFailureListener { e ->
+                    ready = false
+                    setStatus("AUTH_ERROR: ${e.message ?: "unknown"}")
+                    callbackStatus()
+                }
+        } catch (e: Exception) {
+            ready = false
+            setStatus("INIT_ERROR: ${e.message ?: "unknown"}")
+            callbackStatus()
+        }
+    }
+
+    private fun prepareCanonicalState() {
+        stateRef.get()
+            .addOnSuccessListener { snap ->
+                val existing = snap.getValue(String::class.java)
+                if (!existing.isNullOrBlank()) {
+                    startRealtimeListener()
+                    return@addOnSuccessListener
+                }
+
+                legacyRef.get()
+                    .addOnSuccessListener { legacy ->
+                        val legacyJson = snapshotObjectToJson(legacy)
+                        if (legacyJson != null) {
+                            stateRef.setValue(legacyJson.toString())
+                                .addOnCompleteListener {
+                                    startRealtimeListener()
+                                }
+                        } else {
+                            startRealtimeListener()
+                        }
+                    }
+                    .addOnFailureListener {
+                        startRealtimeListener()
+                    }
+            }
+            .addOnFailureListener {
+                startRealtimeListener()
+            }
+    }
+
+    private fun startRealtimeListener() {
+        if (ready) return
+        ready = true
+        setStatus("ONLINE")
+
+        val l = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val text = snapshot.getValue(String::class.java)
+                if (!text.isNullOrBlank()) {
+                    saveBackupFiles(text)
+                    callback("hgNativeRemote", text)
+                }
+                setStatus("ONLINE")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                setStatus("LISTENER_ERROR: ${error.message}")
+                callbackStatus()
+            }
+        }
+
+        listener = l
+        stateRef.addValueEventListener(l)
+        startSyncLoop()
+    }
+
+    private fun startSyncLoop() {
+        if (!ready) return
+        if (!syncing.compareAndSet(false, true)) return
+        runPendingTransaction()
+    }
+
+    private fun runPendingTransaction() {
+        val localText = pendingJson
+        if (localText.isNullOrBlank()) {
+            syncing.set(false)
+            if (!pendingJson.isNullOrBlank()) startSyncLoop()
+            return
+        }
+
+        pendingJson = null
+        val local = try {
+            JSONObject(localText)
+        } catch (_: Exception) {
+            syncing.set(false)
+            setStatus("LOCAL_JSON_ERROR")
+            return
+        }
+
+        setStatus("SYNCING")
+
+        stateRef.runTransaction(object : Transaction.Handler {
+            private var mergedResult: JSONObject? = null
+
+            override fun doTransaction(currentData: MutableData): Transaction.Result {
+                return try {
+                    val remoteText = currentData.getValue(String::class.java)
+                    val remote =
+                        if (remoteText.isNullOrBlank()) null else JSONObject(remoteText)
+                    val merged = mergeStates(remote, local)
+                    mergedResult = merged
+                    currentData.value = merged.toString()
+                    Transaction.success(currentData)
+                } catch (_: Exception) {
+                    Transaction.abort()
+                }
+            }
+
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                currentData: DataSnapshot?
+            ) {
+                if (error != null || !committed) {
+                    if (pendingJson == null) pendingJson = localText
+                    syncing.set(false)
+                    setStatus("SYNC_ERROR: ${error?.message ?: "transaction aborted"}")
+                    callbackStatus()
+                    return
+                }
+
+                val finalText =
+                    currentData?.getValue(String::class.java)
+                        ?: mergedResult?.toString()
+                        ?: localText
+
+                saveBackupFiles(finalText)
+                callback("hgNativeSynced", finalText)
+                setStatus("ONLINE")
+
+                if (!pendingJson.isNullOrBlank()) {
+                    runPendingTransaction()
+                } else {
+                    syncing.set(false)
+                    if (!pendingJson.isNullOrBlank()) startSyncLoop()
+                }
+            }
+        }, false)
+    }
+
+    private fun saveBackupFiles(json: String): Boolean {
+        return try {
             synchronized(this) {
                 val current = File(context.filesDir, "garage_backup_current.json")
-                val previous = File(context.filesDir, "garage_backup_previous.json")
+                val previous1 = File(context.filesDir, "garage_backup_previous_1.json")
+                val previous2 = File(context.filesDir, "garage_backup_previous_2.json")
                 val temp = File(context.filesDir, "garage_backup_temp.json")
+
                 temp.writeText(json)
-                if (previous.exists()) previous.delete()
-                if (current.exists()) current.copyTo(previous, overwrite = true)
+
+                if (previous2.exists()) previous2.delete()
+                if (previous1.exists()) previous1.copyTo(previous2, overwrite = true)
+                if (current.exists()) current.copyTo(previous1, overwrite = true)
                 temp.copyTo(current, overwrite = true)
                 temp.delete()
+
+                saveDailyBackupIfNeeded(json)
             }
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun saveDailyBackupIfNeeded(json: String) {
+        try {
+            val day = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+            val lastDay = prefs.getString("last_daily_backup_day", null)
+            if (lastDay == day) return
+
+            val dir = File(context.filesDir, "daily_backups")
+            if (!dir.exists()) dir.mkdirs()
+            File(dir, "garage-$day.json").writeText(json)
+            prefs.edit().putString("last_daily_backup_day", day).apply()
+
+            val files = dir.listFiles()
+                ?.filter { it.isFile && it.name.startsWith("garage-") }
+                ?.sortedByDescending { it.name }
+                ?: emptyList()
+            files.drop(7).forEach { it.delete() }
         } catch (_: Exception) {
         }
     }
 
-    private fun startSyncLoop() {
-        if (!syncing.compareAndSet(false, true)) return
-        executor.execute {
-            try {
-                while (true) {
-                    val local = pendingJson ?: break
-                    pendingJson = null
-                    try {
-                        val merged = syncOnce(local)
-                        saveBackupFiles(merged.toString())
-                        callback("hgNativeSynced", merged.toString())
-                    } catch (_: Exception) {
-                        // Keep the newest unsent copy queued for a later save/poll cycle.
-                        if (pendingJson == null) pendingJson = local
-                        break
-                    }
-                }
-            } finally {
-                syncing.set(false)
-                if (pendingJson != null) startSyncLoop()
-            }
-        }
-    }
-
-    private fun syncOnce(localJson: String): JSONObject {
-        val local = JSONObject(localJson)
-        repeat(4) {
-            val (remote, etag) = getRemoteStateWithEtag()
-            val merged = mergeStates(remote, local)
-
-            if (remote != null) {
-                try {
-                    putJson(backupPath, JSONObject()
-                        .put("savedAt", System.currentTimeMillis())
-                        .put("deviceId", getDeviceId())
-                        .put("state", remote), null)
-                } catch (_: Exception) {
-                }
-            }
-
-            val result = putJson(statePath, merged, etag)
-            if (result == 200 || result == 204) return merged
-            if (result != 412) throw IllegalStateException("Firebase save failed: $result")
-        }
-        throw IllegalStateException("Firebase save conflict")
-    }
-
     private fun mergeStates(remote: JSONObject?, local: JSONObject): JSONObject {
-        if (remote == null) return JSONObject(local.toString())
+        if (remote == null) return normalizeForMerge(JSONObject(local.toString()))
 
+        val r = normalizeForMerge(JSONObject(remote.toString()))
+        val l = normalizeForMerge(JSONObject(local.toString()))
         val out = JSONObject()
+
         val tombstones = mergeTombstones(
-            remote.optJSONObject("_tombstones"),
-            local.optJSONObject("_tombstones")
+            r.optJSONObject("_tombstones"),
+            l.optJSONObject("_tombstones")
         )
         out.put("_tombstones", tombstones)
 
         for (collection in collections) {
-            val r = remote.optJSONArray(collection) ?: JSONArray()
-            val l = local.optJSONArray(collection) ?: JSONArray()
-            out.put(collection, mergeArray(collection, r, l, tombstones.optJSONObject(collection)))
+            val merged = mergeArray(
+                collection,
+                r.optJSONArray(collection) ?: JSONArray(),
+                l.optJSONArray(collection) ?: JSONArray(),
+                tombstones.optJSONObject(collection)
+            )
+            out.put(collection, merged)
         }
+
         return out
+    }
+
+    private fun normalizeForMerge(obj: JSONObject): JSONObject {
+        if (!obj.has("_tombstones") || obj.optJSONObject("_tombstones") == null) {
+            obj.put("_tombstones", JSONObject())
+        }
+        for (collection in collections) {
+            if (obj.optJSONArray(collection) == null) {
+                obj.put(collection, JSONArray())
+            }
+        }
+        return obj
     }
 
     private fun mergeTombstones(remote: JSONObject?, local: JSONObject?): JSONObject {
         val out = JSONObject()
         val cols = linkedSetOf<String>()
+
         if (remote != null) cols.addAll(remote.keys().asSequence().toList())
         if (local != null) cols.addAll(local.keys().asSequence().toList())
 
@@ -300,11 +512,16 @@ private class NativeSyncBridge(
             val lo = local?.optJSONObject(col)
             val merged = JSONObject()
             val ids = linkedSetOf<String>()
+
             if (ro != null) ids.addAll(ro.keys().asSequence().toList())
             if (lo != null) ids.addAll(lo.keys().asSequence().toList())
+
             for (id in ids) {
-                val ts = maxOf(ro?.optLong(id, 0L) ?: 0L, lo?.optLong(id, 0L) ?: 0L)
-                if (ts > 0) merged.put(id, ts)
+                val ts = maxOf(
+                    ro?.optLong(id, 0L) ?: 0L,
+                    lo?.optLong(id, 0L) ?: 0L
+                )
+                if (ts > 0L) merged.put(id, ts)
             }
             out.put(col, merged)
         }
@@ -326,26 +543,40 @@ private class NativeSyncBridge(
                 map[id] = JSONObject(obj.toString())
                 return
             }
+
             val a = existing.optLong("_updatedAt", 0L)
             val b = obj.optLong("_updatedAt", 0L)
+
             val choose = when {
                 b > a -> true
                 b < a -> false
-                collection == "jobs" -> jobStatusRank(obj) > jobStatusRank(existing)
+                collection == "jobs" && jobStatusRank(obj) != jobStatusRank(existing) ->
+                    jobStatusRank(obj) > jobStatusRank(existing)
                 else -> preferOnTie
             }
+
             if (choose) map[id] = JSONObject(obj.toString())
         }
 
-        for (i in 0 until remote.length()) remote.optJSONObject(i)?.let { take(it, false) }
-        for (i in 0 until local.length()) local.optJSONObject(i)?.let { take(it, true) }
+        for (i in 0 until remote.length()) {
+            remote.optJSONObject(i)?.let { take(it, false) }
+        }
+        for (i in 0 until local.length()) {
+            local.optJSONObject(i)?.let { take(it, true) }
+        }
 
-        val out = JSONArray()
+        val values = mutableListOf<JSONObject>()
         for ((id, obj) in map) {
             val deletedAt = tombstones?.optLong(id, 0L) ?: 0L
-            if (deletedAt <= 0L) out.put(obj)
+            if (collection == "audit" || deletedAt <= 0L) values.add(obj)
         }
-        return out
+
+        if (collection == "audit") {
+            values.sortByDescending { it.optString("time", "") }
+            return JSONArray(values.take(500))
+        }
+
+        return JSONArray(values)
     }
 
     private fun itemId(obj: JSONObject): String {
@@ -362,115 +593,29 @@ private class NativeSyncBridge(
         }
     }
 
-    private fun getRemoteState(): JSONObject? = getRemoteStateWithEtag().first
-
-    private fun getRemoteStateWithEtag(): Pair<JSONObject?, String?> {
-        val token = ensureToken()
-        val url = URL("$databaseUrl/$statePath.json?auth=" +
-            URLEncoder.encode(token, StandardCharsets.UTF_8.name()))
-        val c = (url.openConnection() as HttpURLConnection).apply {
-            requestMethod = "GET"
-            connectTimeout = 12000
-            readTimeout = 12000
-            setRequestProperty("X-Firebase-ETag", "true")
-        }
-        val code = c.responseCode
-        if (code == 401) {
-            idToken = null
-            return getRemoteStateWithEtag()
-        }
-        if (code !in 200..299) throw IllegalStateException("Firebase read failed: $code")
-        val body = c.inputStream.bufferedReader().use { it.readText() }
-        val etag = c.getHeaderField("ETag")
-        val obj = if (body.isBlank() || body == "null") null else JSONObject(body)
-        c.disconnect()
-        return obj to etag
+    private fun snapshotObjectToJson(snapshot: DataSnapshot): JSONObject? {
+        val value = snapshot.value ?: return null
+        val wrapped = JSONObject.wrap(value)
+        return wrapped as? JSONObject
     }
 
-    private fun putJson(path: String, json: JSONObject, etag: String?): Int {
-        val token = ensureToken()
-        val url = URL("$databaseUrl/$path.json?auth=" +
-            URLEncoder.encode(token, StandardCharsets.UTF_8.name()))
-        val c = (url.openConnection() as HttpURLConnection).apply {
-            requestMethod = "PUT"
-            doOutput = true
-            connectTimeout = 12000
-            readTimeout = 12000
-            setRequestProperty("Content-Type", "application/json; charset=UTF-8")
-            if (!etag.isNullOrBlank()) setRequestProperty("if-match", etag)
-        }
-        c.outputStream.use { it.write(json.toString().toByteArray(StandardCharsets.UTF_8)) }
-        val code = c.responseCode
-        if (code == 401) {
-            idToken = null
-            c.disconnect()
-            return putJson(path, json, etag)
-        }
-        try {
-            val stream = if (code in 200..299) c.inputStream else c.errorStream
-            stream?.bufferedReader()?.use { it.readText() }
-        } catch (_: Exception) {
-        }
-        c.disconnect()
-        return code
+    private fun setStatus(value: String) {
+        prefs.edit().putString("sync_status", value).apply()
     }
 
-    @Synchronized
-    private fun ensureToken(): String {
-        idToken?.let { return it }
-
-        val refresh = prefs.getString("refresh_token", null)
-        if (!refresh.isNullOrBlank()) {
-            try {
-                val body = "grant_type=refresh_token&refresh_token=" +
-                    URLEncoder.encode(refresh, StandardCharsets.UTF_8.name())
-                val result = post(
-                    "https://securetoken.googleapis.com/v1/token?key=$apiKey",
-                    body,
-                    "application/x-www-form-urlencoded"
-                )
-                val obj = JSONObject(result)
-                val token = obj.getString("id_token")
-                val newRefresh = obj.optString("refresh_token", refresh)
-                prefs.edit().putString("refresh_token", newRefresh).apply()
-                idToken = token
-                return token
-            } catch (_: Exception) {
-                prefs.edit().remove("refresh_token").apply()
-            }
-        }
-
-        val result = post(
-            "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$apiKey",
-            """{"returnSecureToken":true}""",
-            "application/json; charset=UTF-8"
-        )
-        val obj = JSONObject(result)
-        val token = obj.getString("idToken")
-        prefs.edit().putString("refresh_token", obj.getString("refreshToken")).apply()
-        idToken = token
-        return token
-    }
-
-    private fun post(urlText: String, body: String, contentType: String): String {
-        val c = (URL(urlText).openConnection() as HttpURLConnection).apply {
-            requestMethod = "POST"
-            doOutput = true
-            connectTimeout = 12000
-            readTimeout = 12000
-            setRequestProperty("Content-Type", contentType)
-        }
-        c.outputStream.use { it.write(body.toByteArray(StandardCharsets.UTF_8)) }
-        val code = c.responseCode
-        val stream = if (code in 200..299) c.inputStream else c.errorStream
-        val text = stream?.bufferedReader()?.use { it.readText() } ?: ""
-        c.disconnect()
-        if (code !in 200..299) throw IllegalStateException("Auth failed: $code $text")
-        return text
+    private fun callbackStatus() {
+        val status = getSyncStatus()
+        val script =
+            "window.hgNativeStatus && window.hgNativeStatus(" + JSONObject.quote(status) + ");"
+        webView.post { webView.evaluateJavascript(script, null) }
     }
 
     private fun callback(name: String, json: String) {
         val script = "window.$name && window.$name(" + JSONObject.quote(json) + ");"
         webView.post { webView.evaluateJavascript(script, null) }
+    }
+
+    companion object {
+        private const val FIREBASE_APP_NAME = "hassan-garage-online-app"
     }
 }
