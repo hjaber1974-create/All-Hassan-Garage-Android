@@ -62,7 +62,7 @@ button,.btn{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none
 <body>
 <div id="authScreen" class="auth">
   <div class="auth-card">
-    <div class="auth-top"><div><h1 data-i18n="brand">كراج حسن</h1><div class="muted" data-i18n="authSubtitle">نظام دخول الموظفين وحجز السيارات</div><div class="muted" style="margin-top:4px;font-weight:800">V5.0 FINAL</div></div><div class="language-switch"><button id="authArBtn" class="auth-lang" type="button" onclick="setLanguage('ar')">عربي</button><button id="authEnBtn" class="auth-lang" type="button" onclick="setLanguage('en')">English</button></div></div>
+    <div class="auth-top"><div><h1 data-i18n="brand">كراج حسن</h1><div class="muted" data-i18n="authSubtitle">نظام دخول الموظفين وحجز السيارات</div><div class="muted" style="margin-top:4px;font-weight:800">V5.1 FINAL</div></div><div class="language-switch"><button id="authArBtn" class="auth-lang" type="button" onclick="setLanguage('ar')">عربي</button><button id="authEnBtn" class="auth-lang" type="button" onclick="setLanguage('en')">English</button></div></div>
     <div class="auth-tabs"><button id="staffModeBtn" class="btn primary" data-i18n="staffLoginMode">دخول الموظفين</button><button id="customerModeBtn" class="btn secondary" data-i18n="customerCodeMode">كود الزبون</button></div>
     <div id="staffLogin">
       <label data-i18n="username">اسم المستخدم</label><input id="loginUser" autocomplete="username" />
@@ -89,7 +89,7 @@ button,.btn{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none
 </div>
 
 <div id="appShell" class="hidden">
-<header><div><h1 data-i18n="brand">كراج حسن</h1><div class="sub" data-i18n="subtitle">إدارة السيارات والفواتير والمخزون</div><div class="sub" style="margin-top:2px;font-weight:800">V5.0 FINAL</div></div><div class="head-actions"><span id="userChip" class="user-chip"></span><button id="logoutBtn" class="lang" type="button" onclick="hardLogout(event)" data-i18n="logout">خروج</button><div class="language-switch"><button id="langArBtn" class="lang" type="button" onclick="setLanguage('ar')">عربي</button><button id="langEnBtn" class="lang" type="button" onclick="setLanguage('en')">English</button></div></div></header>
+<header><div><h1 data-i18n="brand">كراج حسن</h1><div class="sub" data-i18n="subtitle">إدارة السيارات والفواتير والمخزون</div><div class="sub" style="margin-top:2px;font-weight:800">V5.1 FINAL</div></div><div class="head-actions"><span id="userChip" class="user-chip"></span><button id="logoutBtn" class="lang" type="button" onclick="hardLogout(event)" data-i18n="logout">خروج</button><div class="language-switch"><button id="langArBtn" class="lang" type="button" onclick="setLanguage('ar')">عربي</button><button id="langEnBtn" class="lang" type="button" onclick="setLanguage('en')">English</button></div></div></header>
 <div class="wrap">
   <div class="tabs no-print">
     <button class="tab active" data-tab="dashboard">🏠 <span data-i18n="dashboard">الرئيسية</span></button>
@@ -710,8 +710,10 @@ $('saveIntake').onclick=()=>{
   const workerId=$('intakeWorker')?.value||'';
   const worker=data.users.find(u=>u.id===workerId);
 
+  const entryStamp=Date.now();
   const j={
-    id:Date.now()+Math.random(),
+    id:entryStamp+Math.random(),
+    enteredAt:entryStamp,
     customer:$('customer').value.trim(),
     phone,
     plate,
@@ -1132,11 +1134,37 @@ function auditName(a){if(a.user==='customer'||a.name==='Customer')return tr('cus
 function renderAudit(){if(!isAdmin())return;const html=data.audit.slice(0,100).map(a=>`<div class="audit"><b>${esc(auditName(a))}</b> — ${esc(auditActionLabel(a))} ${a.detail?`· ${esc(a.detail)}`:''}<div class="muted">${fmtDateTime(a.time)}</div></div>`).join('')||`<div class="muted">${tr('noActivity')}</div>`;$('auditList').innerHTML=html;$('recentAudit').innerHTML=data.audit.slice(0,8).map(a=>`<div class="audit"><b>${esc(auditName(a))}</b> — ${esc(auditActionLabel(a))}<div class="muted">${esc(a.detail||'')} · ${fmtDateTime(a.time)}</div></div>`).join('')||`<div class="muted">${tr('noActivity')}</div>`}
 $('exportBtn').onclick=()=>{if(!isAdmin())return;const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hassan-garage-backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)};
 $('importFile').onchange=e=>{if(!isAdmin())return;const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.jobs)||!Array.isArray(d.stock)||!Array.isArray(d.users))throw Error();data=d;if(!Array.isArray(data.sales))data.sales=[];log('BACKUP_RESTORED');persist();alert(tr('backupRestored'))}catch{alert(tr('invalidFile'))}};r.readAsText(f)};
+function hgEntryTieTime(j){
+  const entered=Number(j?.enteredAt||0);
+  if(Number.isFinite(entered)&&entered>0)return entered;
+  const id=Number(j?.id||0);
+  return Number.isFinite(id)?id:0;
+}
+function hgExitTieTime(j){
+  const exited=Number(j?.exitedAt||0);
+  if(Number.isFinite(exited)&&exited>0)return exited;
+  return hgEntryTieTime(j);
+}
+function hgSortNewestEntryFirst(a,b){
+  const aClock=(a?.dateIn||'')+' '+(a?.timeIn||'');
+  const bClock=(b?.dateIn||'')+' '+(b?.timeIn||'');
+  const byClock=bClock.localeCompare(aClock);
+  if(byClock!==0)return byClock;
+  return hgEntryTieTime(b)-hgEntryTieTime(a);
+}
+function hgSortNewestExitFirst(a,b){
+  const aClock=(a?.dateOut||a?.dateIn||'')+' '+(a?.timeOut||a?.timeIn||'');
+  const bClock=(b?.dateOut||b?.dateIn||'')+' '+(b?.timeOut||b?.timeIn||'');
+  const byClock=bClock.localeCompare(aClock);
+  if(byClock!==0)return byClock;
+  return hgExitTieTime(b)-hgExitTieTime(a);
+}
+
 function renderInsideCars(){
   if(!$('insideCarsList'))return;
   const arr=data.jobs
     .filter(j=>j.status!=='delivered'&&j.exited!==true&&!j.exitedAt)
-    .sort((a,b)=>((b.dateIn||'')+' '+(b.timeIn||'')).localeCompare((a.dateIn||'')+' '+(a.timeIn||'')));
+    .sort(hgSortNewestEntryFirst);
   if($('insideCarsCount'))$('insideCarsCount').textContent=(lang==='ar'?`${arr.length} سيارة`:`${arr.length} cars`);
   if(!arr.length){
     $('insideCarsList').innerHTML=`<div class="muted" style="padding:20px;text-align:center">${lang==='ar'?'لا توجد سيارات داخل الغاراج حالياً':'No vehicles are currently in the garage'}</div>`;
@@ -1162,7 +1190,7 @@ function renderExitedCars(){
   if(!$('exitedCarsList'))return;
   const arr=data.jobs
     .filter(j=>j.status==='delivered'||j.exited===true||!!j.exitedAt)
-    .sort((a,b)=>((b.dateOut||b.dateIn||'')+' '+(b.timeOut||b.timeIn||'')).localeCompare((a.dateOut||a.dateIn||'')+' '+(a.timeOut||a.timeIn||'')));
+    .sort(hgSortNewestExitFirst);
 
   if($('exitedCarsCount')) $('exitedCarsCount').textContent=(lang==='ar'?`${arr.length} سيارة`:`${arr.length} cars`);
 
