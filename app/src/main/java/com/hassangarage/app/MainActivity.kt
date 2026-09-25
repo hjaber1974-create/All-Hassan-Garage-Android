@@ -343,8 +343,7 @@ private class NativeSyncBridge(
         val out = JSONArray()
         for ((id, obj) in map) {
             val deletedAt = tombstones?.optLong(id, 0L) ?: 0L
-            val updatedAt = obj.optLong("_updatedAt", 0L)
-            if (deletedAt <= updatedAt) out.put(obj)
+            if (deletedAt <= 0L) out.put(obj)
         }
         return out
     }
