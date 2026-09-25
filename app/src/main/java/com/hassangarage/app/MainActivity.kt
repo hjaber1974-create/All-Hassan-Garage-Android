@@ -331,8 +331,7 @@ private class NativeSyncBridge(
             val choose = when {
                 b > a -> true
                 b < a -> false
-                collection == "jobs" -> jobStatusRank(obj.optString("status")) >
-                    jobStatusRank(existing.optString("status"))
+                collection == "jobs" -> jobStatusRank(obj) > jobStatusRank(existing)
                 else -> preferOnTie
             }
             if (choose) map[id] = JSONObject(obj.toString())
@@ -355,10 +354,13 @@ private class NativeSyncBridge(
         return if (id == null || id == JSONObject.NULL) obj.toString() else id.toString()
     }
 
-    private fun jobStatusRank(status: String): Int = when (status) {
-        "delivered" -> 3
-        "ready" -> 2
-        else -> 1
+    private fun jobStatusRank(obj: JSONObject): Int {
+        if (obj.optBoolean("exited", false) || obj.optLong("exitedAt", 0L) > 0L) return 4
+        return when (obj.optString("status")) {
+            "delivered" -> 3
+            "ready" -> 2
+            else -> 1
+        }
     }
 
     private fun getRemoteState(): JSONObject? = getRemoteStateWithEtag().first
