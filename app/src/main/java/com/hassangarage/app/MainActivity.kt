@@ -327,7 +327,8 @@ private class NativeSyncBridge(
             override fun onDataChange(snapshot: DataSnapshot) {
                 val text = snapshot.getValue(String::class.java)
                 if (!text.isNullOrBlank()) {
-                    saveBackupFiles(text)
+                    // JS merges this snapshot with the phone's current state first.
+                    // Never save a raw remote snapshot over the newest local backup.
                     callback("hgNativeRemote", text)
                 }
                 setStatus("ONLINE")
@@ -376,7 +377,11 @@ private class NativeSyncBridge(
                 return try {
                     val remoteText = currentData.getValue(String::class.java)
                     val remote =
-                        if (remoteText.isNullOrBlank()) null else JSONObject(remoteText)
+                        if (remoteText.isNullOrBlank()) {
+                            null
+                        } else {
+                            try { JSONObject(remoteText) } catch (_: Exception) { null }
+                        }
                     val merged = mergeStates(remote, local)
                     mergedResult = merged
                     currentData.value = merged.toString()
@@ -396,6 +401,9 @@ private class NativeSyncBridge(
                     syncing.set(false)
                     setStatus("SYNC_ERROR: ${error?.message ?: "transaction aborted"}")
                     callbackStatus()
+                    webView.postDelayed({
+                        if (!pendingJson.isNullOrBlank()) startSyncLoop()
+                    }, 5000L)
                     return
                 }
 
